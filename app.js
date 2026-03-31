@@ -70,7 +70,7 @@ function renderProfiles() {
         <div class="item-meta">${count} сообщений</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        ${name !== "default" ? '<button class="del-btn" data-name="' + name + '">✕</button>' : ""}
+        ${name !== "default" ? '<button class="del-btn" data-name="' + name + '">&#10005;</button>' : ""}
         <div class="item-check"></div>
       </div>`;
     card.querySelector(".item-card-click").onclick = () => switchProfile(name);
@@ -86,7 +86,7 @@ function renderProfiles() {
 }
 
 function renderModels() {
-  const desc = { fast: "Llama 3.1 8B — быстрая", smart: "Llama 3.3 70B — умная", mixtral: "Mixtral 8x7B", gemma: "Gemma 9B" };
+  const desc = { fast: "Llama 3.1 8B", smart: "Llama 3.3 70B", mixtral: "Mixtral 8x7B", gemma: "Gemma 9B" };
   const list = document.getElementById("models-list");
   list.innerHTML = "";
   for (const name of state.models || []) {
@@ -99,16 +99,37 @@ function renderModels() {
   }
 }
 
+// Find which preset matches current style
+function getCurrentPresetName() {
+  if (!state.style_desc) return null;
+  const presets = state.presets || {};
+  for (const [key, info] of Object.entries(presets)) {
+    if (typeof info === "object" && info.name) {
+      return info.name;
+    }
+  }
+  return null;
+}
+
 function renderStyle() {
   const el = document.getElementById("style-status");
   const btn = document.getElementById("analyze-btn");
   if (state.style_desc) {
-    el.textContent = state.style_desc.length > 150 ? state.style_desc.substring(0, 150) + "..." : state.style_desc;
-    el.style.color = "#ccc";
+    // Try to find matching preset name
+    let label = null;
+    const presets = state.presets || {};
+    for (const [key, info] of Object.entries(presets)) {
+      const name = typeof info === "object" ? info.name : info;
+      const short = typeof info === "object" ? info.short : "";
+      // No easy way to match, just show truncated
+    }
+    const display = state.style_desc.length > 120 ? state.style_desc.substring(0, 120) + "..." : state.style_desc;
+    el.textContent = display;
+    el.className = "style-text active";
     btn.textContent = "Переанализировать";
   } else {
     el.textContent = "Стиль не установлен";
-    el.style.color = "#888";
+    el.className = "style-text";
     btn.textContent = "Анализировать из сообщений";
   }
 }
@@ -118,19 +139,27 @@ function renderPresets() {
   if (!list) return;
   list.innerHTML = "";
   const presets = state.presets || {};
-  const presetEmoji = { troll: "🔥", friendly: "😊", chill: "😎", flirt: "😏", formal: "👔" };
-  for (const [key, name] of Object.entries(presets)) {
+  const icons = { troll: "fire", friendly: "wave", chill: "sleep", flirt: "wink", formal: "tie", zek: "lock" };
+  const colors = { troll: "#ef4444", friendly: "#22c55e", chill: "#3b82f6", flirt: "#ec4899", formal: "#6366f1", zek: "#f59e0b" };
+
+  for (const [key, info] of Object.entries(presets)) {
+    const name = typeof info === "object" ? info.name : info;
+    const short = typeof info === "object" ? (info.short || key) : key;
+    const color = colors[key] || "#8b5cf6";
     const card = document.createElement("div");
     card.className = "item-card preset-card";
     card.innerHTML = `
-      <div>
-        <div class="item-name">${presetEmoji[key] || "🎭"} ${name}</div>
-        <div class="item-meta">${key}</div>
+      <div class="preset-info">
+        <div class="item-name" style="display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;box-shadow:0 0 8px ${color}40"></span>
+          ${name}
+        </div>
+        <div class="preset-short">${short}</div>
       </div>
       <button class="apply-btn">Применить</button>`;
     card.querySelector(".apply-btn").onclick = (e) => {
       e.stopPropagation();
-      applyPreset(key);
+      applyPreset(key, e.target);
     };
     list.appendChild(card);
   }
@@ -160,7 +189,6 @@ async function switchProfile(name) {
   document.getElementById("msg-count").textContent = state.msg_count;
   if (tg) tg.HapticFeedback?.impactOccurred("medium");
   await api("/api/profile", "POST", { name });
-  // Reload to get new style_desc for this profile
   await loadStatus();
   busy = false;
 }
@@ -210,10 +238,10 @@ async function deleteProfile(name) {
   }
 }
 
-async function applyPreset(key) {
+async function applyPreset(key, btn) {
   if (busy) return;
   busy = true;
-  const btn = event.target;
+  const origText = btn.textContent;
   btn.textContent = "...";
   btn.style.pointerEvents = "none";
   if (tg) tg.HapticFeedback?.impactOccurred("heavy");
@@ -225,7 +253,7 @@ async function applyPreset(key) {
       if (tg) tg.HapticFeedback?.notificationOccurred("success");
     }
   } catch (e) {}
-  btn.textContent = "Применить";
+  btn.textContent = origText;
   btn.style.pointerEvents = "auto";
   busy = false;
 }
@@ -258,7 +286,8 @@ document.getElementById("analyze-btn").addEventListener("click", async () => {
   btn.textContent = "Анализирую...";
   btn.style.pointerEvents = "none";
   el.textContent = "Подожди 5-10 сек...";
-  el.style.color = "#8b5cf6";
+  el.className = "style-text";
+  el.style.color = "var(--accent)";
   try {
     const res = await api("/api/analyze", "POST");
     if (res.style_desc) {
@@ -266,12 +295,13 @@ document.getElementById("analyze-btn").addEventListener("click", async () => {
       if (tg) tg.HapticFeedback?.notificationOccurred("success");
     } else if (res.error) {
       el.textContent = res.error;
-      el.style.color = "#ef4444";
+      el.style.color = "var(--danger)";
     }
   } catch (e) {
     el.textContent = "Ошибка";
-    el.style.color = "#ef4444";
+    el.style.color = "var(--danger)";
   }
+  el.style.color = "";
   renderStyle();
   btn.style.pointerEvents = "auto";
 });
@@ -305,10 +335,10 @@ initTabs();
 if (tg) {
   tg.ready();
   tg.expand();
-  tg.setHeaderColor("#0a0a0f");
-  tg.setBackgroundColor("#0a0a0f");
+  tg.setHeaderColor("#0c0c14");
+  tg.setBackgroundColor("#0c0c14");
 }
 
 loadStatus().catch(() => {
-  document.getElementById("loading").innerHTML = '<div style="text-align:center;color:#888"><p>Не удалось подключиться</p></div>';
+  document.getElementById("loading").innerHTML = '<div style="text-align:center;color:#6b6b80"><p>Не удалось подключиться</p></div>';
 });

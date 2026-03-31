@@ -24,16 +24,14 @@
     </div>
 
     <!-- Stats -->
-    <div class="section">
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-value" id="msg-count">0</div>
-          <div class="stat-label">Сообщений</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="profiles-count">0</div>
-          <div class="stat-label">Профилей</div>
-        </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="msg-count">0</div>
+        <div class="stat-label">Сообщений</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="profiles-count">0</div>
+        <div class="stat-label">Профилей</div>
       </div>
     </div>
 
@@ -46,7 +44,6 @@
 
     <!-- Tab: Main -->
     <div class="tab-content active" id="tab-main">
-      <!-- Toggles -->
       <div class="section">
         <div class="section-title">Управление</div>
         <div class="card">
@@ -77,13 +74,11 @@
         </div>
       </div>
 
-      <!-- Models -->
       <div class="section">
         <div class="section-title">Модель</div>
         <div class="items-grid" id="models-list"></div>
       </div>
 
-      <!-- Actions -->
       <div class="section">
         <button class="danger-btn" id="clear-btn">Очистить память профиля</button>
       </div>
@@ -91,18 +86,16 @@
 
     <!-- Tab: Styles -->
     <div class="tab-content" id="tab-styles">
-      <!-- Current Style -->
       <div class="section">
         <div class="section-title">Текущий стиль</div>
-        <div class="card" id="style-card">
-          <div style="display:flex;flex-direction:column;gap:10px;padding:4px">
-            <div id="style-status" style="font-size:13px;color:#888">Стиль не установлен</div>
-            <button class="add-btn" id="analyze-btn" style="margin:0">Анализировать из сообщений</button>
+        <div class="card">
+          <div class="style-card-inner">
+            <div id="style-status" class="style-text">Стиль не установлен</div>
+            <button class="analyze-btn" id="analyze-btn">Анализировать из сообщений</button>
           </div>
         </div>
       </div>
 
-      <!-- Presets -->
       <div class="section">
         <div class="section-title">Готовые стили</div>
         <div class="items-grid" id="presets-list"></div>
@@ -120,7 +113,7 @@
 
   </div>
 
-  <!-- Modal: New Profile -->
+  <!-- Modal -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <h3>Новый профиль</h3>
