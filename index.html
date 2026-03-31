@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AI Autoresponder</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- App -->
+  <div id="app" style="display:none">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>AI Autoresponder</h1>
+      <div class="badge" id="profile-badge">default</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section">
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="msg-count">0</div>
+          <div class="stat-label">Сообщений</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="profiles-count">0</div>
+          <div class="stat-label">Профилей</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggles -->
+    <div class="section">
+      <div class="section-title">Управление</div>
+      <div class="card">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Автоответчик</div>
+            <div class="toggle-desc">Отвечает на входящие сообщения</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-auto">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Обучение</div>
+            <div class="toggle-desc">Запоминает твой стиль общения</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-learn">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profiles -->
+    <div class="section">
+      <div class="section-title">Профили</div>
+      <div class="items-grid" id="profiles-list"></div>
+      <button class="add-btn" id="add-profile-btn">+ Новый профиль</button>
+    </div>
+
+    <!-- Models -->
+    <div class="section">
+      <div class="section-title">Модель</div>
+      <div class="items-grid" id="models-list"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="section">
+      <button class="danger-btn" id="clear-btn">Очистить память профиля</button>
+    </div>
+
+  </div>
+
+  <!-- Modal: New Profile -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3>Новый профиль</h3>
+      <input type="text" id="profile-input" placeholder="Имя профиля" autocomplete="off">
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="modal-cancel">Отмена</button>
+        <button class="modal-btn primary" id="modal-create">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
