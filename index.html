@@ -37,64 +37,85 @@
       </div>
     </div>
 
-    <!-- Toggles -->
-    <div class="section">
-      <div class="section-title">Управление</div>
-      <div class="card">
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Автоответчик</div>
-            <div class="toggle-desc">Отвечает на входящие сообщения</div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="main">Главная</button>
+      <button class="tab" data-tab="styles">Стили</button>
+      <button class="tab" data-tab="profiles">Профили</button>
+    </div>
+
+    <!-- Tab: Main -->
+    <div class="tab-content active" id="tab-main">
+      <!-- Toggles -->
+      <div class="section">
+        <div class="section-title">Управление</div>
+        <div class="card">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Автоответчик</div>
+              <div class="toggle-desc">Отвечает на входящие сообщения</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-auto">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
           </div>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-auto">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
         </div>
-      </div>
-      <div class="card">
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Обучение</div>
-            <div class="toggle-desc">Запоминает твой стиль общения</div>
+        <div class="card">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Обучение</div>
+              <div class="toggle-desc">Запоминает твой стиль общения</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-learn">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
           </div>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-learn">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
         </div>
+      </div>
+
+      <!-- Models -->
+      <div class="section">
+        <div class="section-title">Модель</div>
+        <div class="items-grid" id="models-list"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="section">
+        <button class="danger-btn" id="clear-btn">Очистить память профиля</button>
       </div>
     </div>
 
-    <!-- Profiles -->
-    <div class="section">
-      <div class="section-title">Профили</div>
-      <div class="items-grid" id="profiles-list"></div>
-      <button class="add-btn" id="add-profile-btn">+ Новый профиль</button>
-    </div>
-
-    <!-- Models -->
-    <div class="section">
-      <div class="section-title">Модель</div>
-      <div class="items-grid" id="models-list"></div>
-    </div>
-
-    <!-- Style Analysis -->
-    <div class="section">
-      <div class="section-title">Стиль</div>
-      <div class="card" id="style-card">
-        <div class="toggle-row" style="flex-direction:column;align-items:stretch;gap:10px">
-          <div id="style-status" style="font-size:13px;color:#888">Стиль не проанализирован</div>
-          <button class="add-btn" id="analyze-btn" style="margin:0">Анализировать стиль</button>
+    <!-- Tab: Styles -->
+    <div class="tab-content" id="tab-styles">
+      <!-- Current Style -->
+      <div class="section">
+        <div class="section-title">Текущий стиль</div>
+        <div class="card" id="style-card">
+          <div style="display:flex;flex-direction:column;gap:10px;padding:4px">
+            <div id="style-status" style="font-size:13px;color:#888">Стиль не установлен</div>
+            <button class="add-btn" id="analyze-btn" style="margin:0">Анализировать из сообщений</button>
+          </div>
         </div>
+      </div>
+
+      <!-- Presets -->
+      <div class="section">
+        <div class="section-title">Готовые стили</div>
+        <div class="items-grid" id="presets-list"></div>
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="section">
-      <button class="danger-btn" id="clear-btn">Очистить память профиля</button>
+    <!-- Tab: Profiles -->
+    <div class="tab-content" id="tab-profiles">
+      <div class="section">
+        <div class="section-title">Мои профили</div>
+        <div class="items-grid" id="profiles-list"></div>
+        <button class="add-btn" id="add-profile-btn">+ Новый профиль</button>
+      </div>
     </div>
 
   </div>

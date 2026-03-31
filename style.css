@@ -53,6 +53,48 @@ body {
   color: white;
 }
 
+/* === Tabs === */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.tab:active {
+  transform: scale(0.97);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
 /* === Sections === */
 .section {
   margin-bottom: 20px;
@@ -203,10 +245,59 @@ body {
 }
 
 .item-card.active .item-check::after {
-  content: "✓";
+  content: "\2713";
   color: white;
   font-size: 12px;
   font-weight: bold;
+}
+
+/* === Delete Button (inline) === */
+.del-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.del-btn:active {
+  background: rgba(239, 68, 68, 0.3);
+  transform: scale(0.9);
+}
+
+/* === Apply Preset Button === */
+.apply-btn {
+  padding: 8px 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.apply-btn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.preset-card {
+  cursor: default;
+}
+
+.preset-card:active {
+  transform: none;
 }
 
 /* === Add Button === */

@@ -24,6 +24,20 @@ async function loadStatus() {
   render();
 }
 
+// === Tabs ===
+
+function initTabs() {
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+      if (tg) tg.HapticFeedback?.impactOccurred("light");
+    });
+  });
+}
+
 // === Render ===
 
 function render() {
@@ -40,6 +54,7 @@ function render() {
   renderProfiles();
   renderModels();
   renderStyle();
+  renderPresets();
 }
 
 function renderProfiles() {
@@ -49,8 +64,23 @@ function renderProfiles() {
     const active = name === state.profile;
     const card = document.createElement("div");
     card.className = "item-card" + (active ? " active" : "");
-    card.innerHTML = `<div><div class="item-name">${name}</div><div class="item-meta">${count} сообщений</div></div><div class="item-check"></div>`;
-    card.onclick = () => switchProfile(name);
+    card.innerHTML = `
+      <div style="flex:1" class="item-card-click">
+        <div class="item-name">${name}</div>
+        <div class="item-meta">${count} сообщений</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${name !== "default" ? '<button class="del-btn" data-name="' + name + '">✕</button>' : ""}
+        <div class="item-check"></div>
+      </div>`;
+    card.querySelector(".item-card-click").onclick = () => switchProfile(name);
+    const delBtn = card.querySelector(".del-btn");
+    if (delBtn) {
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteProfile(name);
+      };
+    }
     list.appendChild(card);
   }
 }
@@ -73,17 +103,40 @@ function renderStyle() {
   const el = document.getElementById("style-status");
   const btn = document.getElementById("analyze-btn");
   if (state.style_desc) {
-    el.textContent = state.style_desc;
+    el.textContent = state.style_desc.length > 150 ? state.style_desc.substring(0, 150) + "..." : state.style_desc;
     el.style.color = "#ccc";
     btn.textContent = "Переанализировать";
   } else {
-    el.textContent = "Стиль не проанализирован";
+    el.textContent = "Стиль не установлен";
     el.style.color = "#888";
-    btn.textContent = "Анализировать стиль";
+    btn.textContent = "Анализировать из сообщений";
   }
 }
 
-// === Actions (optimistic UI — обновляем сразу, потом шлём запрос) ===
+function renderPresets() {
+  const list = document.getElementById("presets-list");
+  if (!list) return;
+  list.innerHTML = "";
+  const presets = state.presets || {};
+  const presetEmoji = { troll: "🔥", friendly: "😊", chill: "😎", flirt: "😏", formal: "👔" };
+  for (const [key, name] of Object.entries(presets)) {
+    const card = document.createElement("div");
+    card.className = "item-card preset-card";
+    card.innerHTML = `
+      <div>
+        <div class="item-name">${presetEmoji[key] || "🎭"} ${name}</div>
+        <div class="item-meta">${key}</div>
+      </div>
+      <button class="apply-btn">Применить</button>`;
+    card.querySelector(".apply-btn").onclick = (e) => {
+      e.stopPropagation();
+      applyPreset(key);
+    };
+    list.appendChild(card);
+  }
+}
+
+// === Actions ===
 
 async function toggleAuto(enabled) {
   state.auto_reply = enabled;
@@ -107,6 +160,8 @@ async function switchProfile(name) {
   document.getElementById("msg-count").textContent = state.msg_count;
   if (tg) tg.HapticFeedback?.impactOccurred("medium");
   await api("/api/profile", "POST", { name });
+  // Reload to get new style_desc for this profile
+  await loadStatus();
   busy = false;
 }
 
@@ -130,6 +185,48 @@ async function createProfile(name) {
   render();
   if (tg) tg.HapticFeedback?.notificationOccurred("success");
   await api("/api/newprofile", "POST", { name });
+  busy = false;
+}
+
+async function deleteProfile(name) {
+  const doDelete = async () => {
+    if (busy) return;
+    busy = true;
+    delete state.profiles[name];
+    if (state.profile === name) {
+      state.profile = "default";
+      state.msg_count = state.profiles["default"] || 0;
+    }
+    render();
+    if (tg) tg.HapticFeedback?.notificationOccurred("warning");
+    await api("/api/delprofile", "POST", { name });
+    busy = false;
+  };
+
+  if (tg) {
+    tg.showConfirm(`Удалить профиль '${name}'?`, (ok) => { if (ok) doDelete(); });
+  } else {
+    if (confirm(`Удалить профиль '${name}'?`)) doDelete();
+  }
+}
+
+async function applyPreset(key) {
+  if (busy) return;
+  busy = true;
+  const btn = event.target;
+  btn.textContent = "...";
+  btn.style.pointerEvents = "none";
+  if (tg) tg.HapticFeedback?.impactOccurred("heavy");
+  try {
+    const res = await api("/api/preset", "POST", { preset: key });
+    if (res.style_desc) {
+      state.style_desc = res.style_desc;
+      renderStyle();
+      if (tg) tg.HapticFeedback?.notificationOccurred("success");
+    }
+  } catch (e) {}
+  btn.textContent = "Применить";
+  btn.style.pointerEvents = "auto";
   busy = false;
 }
 
@@ -202,6 +299,8 @@ document.getElementById("profile-input").addEventListener("keydown", (e) => {
 });
 
 // === Init ===
+
+initTabs();
 
 if (tg) {
   tg.ready();
