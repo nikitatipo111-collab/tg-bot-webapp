@@ -51,6 +51,15 @@ function render() {
   document.getElementById("toggle-auto").checked = state.auto_reply;
   document.getElementById("toggle-learn").checked = state.learning;
 
+  // Voice toggle — show only if configured
+  const voiceCard = document.getElementById("voice-card");
+  if (state.voice_available) {
+    voiceCard.style.display = "";
+    document.getElementById("toggle-voice").checked = state.voice_mode;
+  } else {
+    voiceCard.style.display = "none";
+  }
+
   renderProfiles();
   renderModels();
   renderStyle();
@@ -179,6 +188,12 @@ async function toggleLearn(enabled) {
   api("/api/learning", "POST", { enabled });
 }
 
+async function toggleVoice(enabled) {
+  state.voice_mode = enabled;
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+  api("/api/voice", "POST", { enabled });
+}
+
 async function switchProfile(name) {
   if (busy || name === state.profile) return;
   busy = true;
@@ -278,6 +293,7 @@ async function clearMemory() {
 
 document.getElementById("toggle-auto").addEventListener("change", (e) => toggleAuto(e.target.checked));
 document.getElementById("toggle-learn").addEventListener("change", (e) => toggleLearn(e.target.checked));
+document.getElementById("toggle-voice").addEventListener("change", (e) => toggleVoice(e.target.checked));
 document.getElementById("clear-btn").addEventListener("click", clearMemory);
 
 document.getElementById("analyze-btn").addEventListener("click", async () => {
