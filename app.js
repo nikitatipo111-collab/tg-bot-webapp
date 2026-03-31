@@ -39,6 +39,7 @@ function render() {
 
   renderProfiles();
   renderModels();
+  renderStyle();
 }
 
 function renderProfiles() {
@@ -65,6 +66,20 @@ function renderModels() {
     card.innerHTML = `<div><div class="item-name">${name}</div><div class="item-meta">${desc[name] || name}</div></div><div class="item-check"></div>`;
     card.onclick = () => switchModel(name);
     list.appendChild(card);
+  }
+}
+
+function renderStyle() {
+  const el = document.getElementById("style-status");
+  const btn = document.getElementById("analyze-btn");
+  if (state.style_desc) {
+    el.textContent = state.style_desc;
+    el.style.color = "#ccc";
+    btn.textContent = "Переанализировать";
+  } else {
+    el.textContent = "Стиль не проанализирован";
+    el.style.color = "#888";
+    btn.textContent = "Анализировать стиль";
   }
 }
 
@@ -139,6 +154,30 @@ async function clearMemory() {
 document.getElementById("toggle-auto").addEventListener("change", (e) => toggleAuto(e.target.checked));
 document.getElementById("toggle-learn").addEventListener("change", (e) => toggleLearn(e.target.checked));
 document.getElementById("clear-btn").addEventListener("click", clearMemory);
+
+document.getElementById("analyze-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("analyze-btn");
+  const el = document.getElementById("style-status");
+  btn.textContent = "Анализирую...";
+  btn.style.pointerEvents = "none";
+  el.textContent = "Подожди 5-10 сек...";
+  el.style.color = "#8b5cf6";
+  try {
+    const res = await api("/api/analyze", "POST");
+    if (res.style_desc) {
+      state.style_desc = res.style_desc;
+      if (tg) tg.HapticFeedback?.notificationOccurred("success");
+    } else if (res.error) {
+      el.textContent = res.error;
+      el.style.color = "#ef4444";
+    }
+  } catch (e) {
+    el.textContent = "Ошибка";
+    el.style.color = "#ef4444";
+  }
+  renderStyle();
+  btn.style.pointerEvents = "auto";
+});
 
 document.getElementById("add-profile-btn").addEventListener("click", () => {
   document.getElementById("modal").classList.add("show");
