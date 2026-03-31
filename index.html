@@ -9,6 +9,13 @@
 </head>
 <body>
 
+  <!-- Aurora background -->
+  <div class="aurora">
+    <div class="aurora-orb"></div>
+    <div class="aurora-orb"></div>
+    <div class="aurora-orb"></div>
+  </div>
+
   <!-- Loading -->
   <div id="loading" class="loading">
     <div class="spinner"></div>
@@ -17,13 +24,11 @@
   <!-- App -->
   <div id="app" style="display:none">
 
-    <!-- Header -->
     <div class="header">
       <h1>AI Autoresponder</h1>
       <div class="badge" id="profile-badge">default</div>
     </div>
 
-    <!-- Stats -->
     <div class="stats">
       <div class="stat">
         <div class="stat-value" id="msg-count">0</div>
@@ -35,7 +40,6 @@
       </div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
       <button class="tab active" data-tab="main">Главная</button>
       <button class="tab" data-tab="styles">Стили</button>
@@ -50,7 +54,7 @@
           <div class="toggle-row">
             <div>
               <div class="toggle-label">Автоответчик</div>
-              <div class="toggle-desc">Отвечает на входящие сообщения</div>
+              <div class="toggle-desc">Отвечает на входящие</div>
             </div>
             <label class="toggle">
               <input type="checkbox" id="toggle-auto">
@@ -63,7 +67,7 @@
           <div class="toggle-row">
             <div>
               <div class="toggle-label">Обучение</div>
-              <div class="toggle-desc">Запоминает твой стиль общения</div>
+              <div class="toggle-desc">Запоминает стиль</div>
             </div>
             <label class="toggle">
               <input type="checkbox" id="toggle-learn">
@@ -80,7 +84,7 @@
       </div>
 
       <div class="section">
-        <button class="danger-btn" id="clear-btn">Очистить память профиля</button>
+        <button class="danger-btn" id="clear-btn">Очистить память</button>
       </div>
     </div>
 
@@ -95,7 +99,6 @@
           </div>
         </div>
       </div>
-
       <div class="section">
         <div class="section-title">Готовые стили</div>
         <div class="items-grid" id="presets-list"></div>
