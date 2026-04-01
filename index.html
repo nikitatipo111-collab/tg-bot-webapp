@@ -268,27 +268,40 @@
     <!-- Screen 2: Chat view -->
     <div id="tg-screen-chat" class="tg-screen tg-offscreen-right">
       <div class="tg-chat-topbar">
-        <button class="tg-chat-back" id="tg-chat-back">✕</button>
-        <div class="tg-av tg-av-sm" id="tg-chat-av"></div>
+        <button class="tg-chat-back" id="tg-chat-back">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div class="tg-chat-title-wrap">
           <div class="tg-chat-title" id="tg-chat-title"></div>
           <div class="tg-chat-subtitle" id="tg-chat-sub"></div>
         </div>
+        <div class="tg-chat-av-right" id="tg-chat-av"></div>
       </div>
 
       <div class="tg-banner">
         <div class="tg-banner-av">Ai</div>
         <div class="tg-banner-info">
           <div class="tg-banner-name">Ai</div>
-          <div class="tg-banner-desc">антиудаление активно</div>
+          <div class="tg-banner-desc">бот управляет этим чатом</div>
         </div>
+        <button class="tg-banner-stop">СТОП</button>
       </div>
 
       <div id="tg-chat-msgs" class="tg-chat-msgs"></div>
 
       <div class="tg-chat-bottom">
-        <span class="tg-readonly-icon">🔒</span>
-        <div class="tg-input-fake">Только просмотр</div>
+        <button class="tg-input-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="tg-input-fake">Сообщение</div>
+        <div class="tg-input-right">
+          <button class="tg-input-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
+          </button>
+          <button class="tg-input-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 10v2a7 7 0 01-14 0v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -681,11 +681,11 @@ function updateTGFilterCounts(chats) {
 async function openTGChat(chatId, name) {
   const displayName = tgStripOwn(name);
   const av = document.getElementById("tg-chat-av");
-  av.className = "tg-av tg-av-sm";
+  av.className = "tg-chat-av-right";
   av.style.background = tgAvStyle(chatId);
   av.textContent = tgInitial(displayName);
   document.getElementById("tg-chat-title").textContent = displayName;
-  document.getElementById("tg-chat-sub").textContent = "антиудаление активно";
+  document.getElementById("tg-chat-sub").textContent = "был(а) недавно";
 
   // Slide in
   document.getElementById("tg-screen-chat").classList.remove("tg-offscreen-right");
@@ -716,6 +716,12 @@ function tgDateLabel(dateStr) {
   return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
 }
 
+function tgMediaUrl(fileId) {
+  if (!fileId) return "";
+  const initData = tg?.initData || "";
+  return `${API_URL}/api/tgdel/media?file_id=${encodeURIComponent(fileId)}&init_data=${encodeURIComponent(initData)}`;
+}
+
 function renderTGMsgs(msgs) {
   const el = document.getElementById("tg-chat-msgs");
   if (!msgs.length) {
@@ -723,44 +729,92 @@ function renderTGMsgs(msgs) {
     return;
   }
 
+  const checks = `<span class="tg-bub-checks"><svg width="16" height="10" viewBox="0 0 16 10"><path d="M1 5l3 3 7-7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5l3 3 7-7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+
   let lastDate = null;
-  const html = msgs.map(m => {
+  const html = msgs.map((m, i) => {
     const own = m.is_own;
     const side = own ? "tg-bub-right" : "";
-    const media = m.msg_type !== "text" ? `<div class="tg-bub-media">📎 ${m.msg_type}</div>` : "";
+    const isPhoto = m.msg_type === "photo" || m.msg_type === "sticker";
+    const isVoice = m.msg_type === "voice" || m.msg_type === "video_note";
+    const isVideo = m.msg_type === "video";
+    const hasFile = !!m.file_id;
+    const hasText = !!(m.original || m.new_text);
 
     // Date separator
     let dateSep = "";
-    const dateLabel = tgDateLabel(m.date || m.created_at);
+    const dateLabel = tgDateLabel(m.date);
     if (dateLabel && dateLabel !== lastDate) {
       lastDate = dateLabel;
       dateSep = `<div class="tg-date-sep"><span>${dateLabel}</span></div>`;
     }
 
+    // Check if next message is from same sender (for tail logic)
+    const next = msgs[i + 1];
+    const isLast = !next || next.is_own !== own;
+    const tailClass = isLast ? (own ? "tg-bub-tail-right" : "tg-bub-tail-left") : "";
+
+    // Meta: time + checks
+    const meta = `<span class="tg-bub-meta"><span class="tg-bub-meta-time">${m.time}</span>${own ? checks : ""}</span>`;
+
+    // Photo rendering
+    function photoBlock() {
+      if (!hasFile) return '<div class="tg-bub-media">📷 фото</div>';
+      return `<div class="tg-bub-photo"><img src="${tgMediaUrl(m.file_id)}" alt="photo" loading="lazy"></div>`;
+    }
+
+    // Media type label
+    function mediaLabel() {
+      if (isVoice) return `<div class="tg-bub-media">🎤 голосовое</div>`;
+      if (isVideo) return `<div class="tg-bub-media">🎬 видео</div>`;
+      if (m.msg_type === "document") return `<div class="tg-bub-media">📄 документ</div>`;
+      if (m.msg_type === "sticker") return hasFile ? `<div class="tg-bub-photo"><img src="${tgMediaUrl(m.file_id)}" alt="sticker" style="max-width:150px"></div>` : `<div class="tg-bub-media">🏷 стикер</div>`;
+      return "";
+    }
+
+    // Photo-only bubble class
+    const photoOnlyClass = isPhoto && hasFile && !hasText ? "tg-bub-photo-only" : "";
+
+    function wrapBubble(content) {
+      return `<div class="tg-bub ${side} ${tailClass} ${photoOnlyClass}">${content}</div>`;
+    }
+
     if (m.event === "deleted") {
-      return `${dateSep}<div class="tg-bub ${side}">
-        <div class="tg-bub-txt">${m.original || ""}</div>${media}
+      let content = "";
+      if (isPhoto) {
+        content = `${photoBlock()}${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}`;
+      } else if (m.msg_type !== "text") {
+        content = `${mediaLabel()}${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}`;
+      } else {
+        content = `<div class="tg-bub-txt">${m.original || ""}</div>`;
+      }
+      return `${dateSep}${wrapBubble(`${content}
         <div class="tg-bub-lbl tg-lbl-del">🗑 удалено ${m.time}</div>
-        <div class="tg-bub-time">${m.time}</div>
-      </div>`;
+        ${meta}
+      `)}`;
     } else if (m.event === "edited") {
-      return `${dateSep}<div class="tg-bub ${side}">
+      return `${dateSep}${wrapBubble(`
         <div class="tg-bub-txt strike">${m.original || ""}</div>
-        <div class="tg-bub-lbl tg-lbl-was">✏️ изменено ${m.time}</div>
-        <div class="tg-bub-time">${m.time}</div>
-      </div>
+        <div class="tg-bub-lbl tg-lbl-was">✏️ было</div>
+        ${meta}
+      `)}
       <div class="tg-arrow ${own ? "tg-arrow-right" : ""}">↓</div>
-      <div class="tg-bub ${side}">
+      ${wrapBubble(`
         <div class="tg-bub-txt">${m.new_text || ""}</div>
-        <div class="tg-bub-lbl tg-lbl-now">→ новый текст</div>
-      </div>`;
+        <div class="tg-bub-lbl tg-lbl-now">✏️ стало</div>
+        ${meta}
+      `)}`;
     } else if (m.event === "view_once") {
-      return `${dateSep}<div class="tg-bub ${side}">
-        ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}
-        ${media || '<div class="tg-bub-media">📷 медиа</div>'}
-        <div class="tg-bub-lbl tg-lbl-vo">👁 одноразовое ${m.time}</div>
-        <div class="tg-bub-time">${m.time}</div>
-      </div>`;
+      let content = "";
+      if (isPhoto && hasFile) {
+        content = photoBlock();
+      } else {
+        content = m.original ? `<div class="tg-bub-txt">${m.original}</div>` : '<div class="tg-bub-media">📷 одноразовое медиа</div>';
+      }
+      return `${dateSep}${wrapBubble(`${content}
+        <div class="tg-bub-lbl tg-lbl-vo">👁 одноразовое</div>
+        ${meta}
+      `)}`;
     }
     return dateSep;
   }).join("");
