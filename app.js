@@ -650,27 +650,29 @@ function renderTGMsgs(msgs) {
     return;
   }
   el.innerHTML = msgs.map(m => {
+    const own = m.is_own;
+    const side = own ? "tg-bub-right" : "";
     const media = m.msg_type !== "text" ? `<div class="tg-bub-media">📎 ${m.msg_type}</div>` : "";
 
     if (m.event === "deleted") {
-      return `<div class="tg-bub tg-bub-del">
+      return `<div class="tg-bub tg-bub-del ${side}">
         <div class="tg-bub-lbl tg-lbl-del">УДАЛЕНО</div>
         ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}${media}
         <div class="tg-bub-time">${m.time}</div>
       </div>`;
     } else if (m.event === "edited") {
-      return `<div class="tg-bub tg-bub-old">
+      return `<div class="tg-bub tg-bub-old ${side}">
         <div class="tg-bub-lbl tg-lbl-was">БЫЛО</div>
         <div class="tg-bub-txt strike">${m.original || ""}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>
-      <div class="tg-arrow">↓</div>
-      <div class="tg-bub tg-bub-new">
+      <div class="tg-arrow ${side}">↓</div>
+      <div class="tg-bub tg-bub-new ${side}">
         <div class="tg-bub-lbl tg-lbl-now">СТАЛО</div>
         <div class="tg-bub-txt">${m.new_text || ""}</div>
       </div>`;
     } else if (m.event === "view_once") {
-      return `<div class="tg-bub tg-bub-vo">
+      return `<div class="tg-bub tg-bub-vo ${side}">
         <div class="tg-bub-lbl tg-lbl-vo">ОДНОРАЗОВОЕ</div>
         ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}
         ${media || '<div class="tg-bub-media">📷 медиа</div>'}

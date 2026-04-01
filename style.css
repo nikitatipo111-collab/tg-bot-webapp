@@ -955,6 +955,12 @@ body {
   flex-direction: column;
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
+  background: #000;
+  z-index: 1;
+}
+
+#tg-screen-chat {
+  z-index: 2;
 }
 
 .tg-offscreen-right { transform: translateX(100%); }
@@ -1274,6 +1280,37 @@ body {
 .tg-bub-vo {
   background: #150D1A;
   border: 1px solid rgba(175, 82, 222, 0.35);
+}
+
+/* Own messages — right side, blue TG style */
+.tg-bub-right {
+  align-self: flex-end;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.tg-bub-right.tg-bub-del {
+  background: #0C2942;
+  border-color: rgba(42, 171, 238, 0.35);
+}
+
+.tg-bub-right.tg-bub-old {
+  background: #1A1508;
+  border-color: rgba(255, 159, 10, 0.35);
+}
+
+.tg-bub-right.tg-bub-new {
+  background: #0A1A0D;
+  border-color: rgba(52, 199, 89, 0.35);
+}
+
+.tg-bub-right.tg-bub-vo {
+  background: #150D1A;
+  border-color: rgba(175, 82, 222, 0.35);
+}
+
+.tg-arrow.tg-bub-right {
+  text-align: right;
+  margin-right: 12px;
 }
 
 .tg-bub-lbl {
