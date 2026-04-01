@@ -901,7 +901,29 @@ function fillTGSettings() {
 
 // === Init ===
 
-// TGDel tab buttonsdocument.querySelectorAll(".tg-tab-btn[data-screen]").forEach(btn => {  btn.addEventListener("click", () => tgSwitchScreen(btn.dataset.screen));});// Settings toggle syncdocument.getElementById("toggle-tgdel-settings")?.addEventListener("change", async (e) => {  const enabled = e.target.checked;  document.getElementById("toggle-tgdel").checked = enabled;  await api("/api/tgdel/toggle", "POST", { enabled });});// Clear historydocument.getElementById("tg-clear-history")?.addEventListener("click", async () => {  if (confirm("Очистить всю историю удалённых сообщений?")) {    await api("/api/tgdel/clear", "POST");    loadTGChats();    tgSwitchScreen("list");  }});// Exit from settingsdocument.getElementById("tg-exit3")?.addEventListener("click", closeTGDel);
+// TGDel tab buttons
+document.querySelectorAll(".tg-tab-btn[data-screen]").forEach(btn => {
+  btn.addEventListener("click", () => tgSwitchScreen(btn.dataset.screen));
+});
+
+// Settings toggle sync
+document.getElementById("toggle-tgdel-settings")?.addEventListener("change", async (e) => {
+  const enabled = e.target.checked;
+  document.getElementById("toggle-tgdel").checked = enabled;
+  await api("/api/tgdel/toggle", "POST", { enabled });
+});
+
+// Clear history
+document.getElementById("tg-clear-history")?.addEventListener("click", async () => {
+  if (confirm("Очистить всю историю удалённых сообщений?")) {
+    await api("/api/tgdel/clear", "POST");
+    loadTGChats();
+    tgSwitchScreen("list");
+  }
+});
+
+// Exit from settings
+document.getElementById("tg-exit3")?.addEventListener("click", closeTGDel);
 initTabs();
 initSliders();
 
