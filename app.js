@@ -481,6 +481,17 @@ document.getElementById("blacklist-add-btn").addEventListener("click", addToBlac
 document.getElementById("tg-exit").addEventListener("click", closeTGDel);
 document.getElementById("tg-exit2").addEventListener("click", closeTGDel);
 document.getElementById("tg-chat-back").addEventListener("click", closeTGChat);
+
+// Filter click handlers
+document.querySelectorAll(".tg-filter").forEach(f => {
+  f.addEventListener("click", () => {
+    document.querySelectorAll(".tg-filter").forEach(x => x.classList.remove("active"));
+    f.classList.add("active");
+    tgActiveFilter = f.dataset.filter;
+    if (tgCachedChats.length) renderTGChats(tgCachedChats);
+    if (tg) tg.HapticFeedback?.impactOccurred("light");
+  });
+});
 document.getElementById("toggle-tgdel").addEventListener("change", (e) => {
   api("/api/tgdel/toggle", "POST", { enabled: e.target.checked });
   if (tg) tg.HapticFeedback?.impactOccurred("light");
@@ -536,6 +547,9 @@ document.getElementById("profile-input").addEventListener("keydown", (e) => {
 
 // === TGDel — Fullscreen Telegram Clone ===
 
+let tgCachedChats = [];
+let tgActiveFilter = "all";
+
 const TG_GRADIENTS = [
   "linear-gradient(135deg, #FF885E, #FF516A)",
   "linear-gradient(135deg, #FFD54F, #FF9800)",
@@ -567,6 +581,10 @@ function closeTGDel() {
   document.body.style.overflow = "";
   // Reset to list screen
   document.getElementById("tg-screen-chat").classList.add("tg-offscreen-right");
+  // Reset filter
+  tgActiveFilter = "all";
+  document.querySelectorAll(".tg-filter").forEach(f => f.classList.remove("active"));
+  document.querySelector('.tg-filter[data-filter="all"]')?.classList.add("active");
   // Switch back to main tab
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
@@ -583,6 +601,10 @@ async function loadTGChats() {
   } catch (e) {}
 }
 
+function tgStripOwn(name) {
+  return (name || "").replace(/^OWN:/, "");
+}
+
 function renderTGChats(chats) {
   const el = document.getElementById("tg-chat-list");
   if (!chats.length) {
@@ -592,22 +614,39 @@ function renderTGChats(chats) {
         <div class="tg-empty-text">Удалённых сообщений нет</div>
         <div class="tg-empty-sub">Включи TGDel и жди</div>
       </div>`;
+    updateTGFilterCounts([]);
     return;
   }
-  el.innerHTML = chats.map(c => {
+
+  // Cache chats for filtering
+  tgCachedChats = chats;
+  updateTGFilterCounts(chats);
+
+  // Apply active filter
+  const filtered = tgActiveFilter === "all" ? chats : chats.filter(c => {
+    const t = (c.last_type || "text").toLowerCase();
+    if (tgActiveFilter === "text") return t === "text" || t === "deleted" || t === "edited";
+    if (tgActiveFilter === "photo") return t === "photo" || t === "view_once";
+    if (tgActiveFilter === "voice") return t === "voice";
+    if (tgActiveFilter === "video") return t === "video";
+    return true;
+  });
+
+  el.innerHTML = filtered.map(c => {
+    const displayName = tgStripOwn(c.name);
     const icon = c.last_type === "edited" ? "✏️ " : c.last_type === "view_once" ? "👁 " : "🗑 ";
     const prev = (c.last_text || "медиа").substring(0, 45);
     return `
-    <div class="tg-chat-row" data-cid="${c.chat_id}" data-cname="${c.name}">
-      <div class="tg-av" style="background:${tgAvStyle(c.chat_id)}">${tgInitial(c.name)}</div>
+    <div class="tg-chat-row" data-cid="${c.chat_id}" data-cname="${displayName}">
+      <div class="tg-av" style="background:${tgAvStyle(c.chat_id)}">${tgInitial(displayName)}</div>
       <div class="tg-chat-body">
         <div class="tg-row-top">
-          <div class="tg-chat-name">${c.name}</div>
+          <div class="tg-chat-name">${displayName}</div>
           <div class="tg-row-time">${c.last_time}</div>
         </div>
         <div class="tg-row-bottom">
           <div class="tg-row-preview">${icon}${prev}</div>
-          <div class="tg-row-badge red">${c.count}</div>
+          <div class="tg-row-badge">${c.count}</div>
         </div>
       </div>
     </div>`;
@@ -620,12 +659,32 @@ function renderTGChats(chats) {
   });
 }
 
+function updateTGFilterCounts(chats) {
+  const counts = { all: 0, text: 0, photo: 0, voice: 0, video: 0 };
+  chats.forEach(c => {
+    counts.all += c.count || 0;
+    const t = (c.last_type || "text").toLowerCase();
+    if (t === "text" || t === "deleted" || t === "edited") counts.text += c.count || 0;
+    else if (t === "photo" || t === "view_once") counts.photo += c.count || 0;
+    else if (t === "voice") counts.voice += c.count || 0;
+    else if (t === "video") counts.video += c.count || 0;
+    else counts.text += c.count || 0;
+  });
+  document.querySelectorAll(".tg-filter").forEach(f => {
+    const key = f.dataset.filter;
+    const label = { all: "Все", text: "Текст", photo: "Фото", voice: "Голос", video: "Видео" }[key] || key;
+    const cnt = counts[key] || 0;
+    f.textContent = cnt > 0 ? `${label} ${cnt}` : label;
+  });
+}
+
 async function openTGChat(chatId, name) {
+  const displayName = tgStripOwn(name);
   const av = document.getElementById("tg-chat-av");
   av.className = "tg-av tg-av-sm";
   av.style.background = tgAvStyle(chatId);
-  av.textContent = tgInitial(name);
-  document.getElementById("tg-chat-title").textContent = name;
+  av.textContent = tgInitial(displayName);
+  document.getElementById("tg-chat-title").textContent = displayName;
   document.getElementById("tg-chat-sub").textContent = "антиудаление активно";
 
   // Slide in
@@ -645,44 +704,67 @@ function closeTGChat() {
   if (tg) tg.HapticFeedback?.impactOccurred("light");
 }
 
+function tgDateLabel(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date();
+  const d = new Date(dateStr);
+  if (isNaN(d)) return null;
+  const todayStr = today.toDateString();
+  const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+  if (d.toDateString() === todayStr) return "Сегодня";
+  if (d.toDateString() === yest.toDateString()) return "Вчера";
+  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+}
+
 function renderTGMsgs(msgs) {
   const el = document.getElementById("tg-chat-msgs");
   if (!msgs.length) {
     el.innerHTML = '<div class="tg-empty" style="height:100%"><div class="tg-empty-text">Пусто</div></div>';
     return;
   }
-  el.innerHTML = msgs.map(m => {
+
+  let lastDate = null;
+  const html = msgs.map(m => {
     const own = m.is_own;
     const side = own ? "tg-bub-right" : "";
     const media = m.msg_type !== "text" ? `<div class="tg-bub-media">📎 ${m.msg_type}</div>` : "";
 
+    // Date separator
+    let dateSep = "";
+    const dateLabel = tgDateLabel(m.date || m.created_at);
+    if (dateLabel && dateLabel !== lastDate) {
+      lastDate = dateLabel;
+      dateSep = `<div class="tg-date-sep"><span>${dateLabel}</span></div>`;
+    }
+
     if (m.event === "deleted") {
-      return `<div class="tg-bub ${side}">
+      return `${dateSep}<div class="tg-bub ${side}">
         <div class="tg-bub-txt">${m.original || ""}</div>${media}
         <div class="tg-bub-lbl tg-lbl-del">🗑 удалено ${m.time}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>`;
     } else if (m.event === "edited") {
-      return `<div class="tg-bub ${side}">
+      return `${dateSep}<div class="tg-bub ${side}">
         <div class="tg-bub-txt strike">${m.original || ""}</div>
         <div class="tg-bub-lbl tg-lbl-was">✏️ изменено ${m.time}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>
-      <div class="tg-arrow ${side}">↓</div>
+      <div class="tg-arrow ${own ? "tg-arrow-right" : ""}">↓</div>
       <div class="tg-bub ${side}">
         <div class="tg-bub-txt">${m.new_text || ""}</div>
         <div class="tg-bub-lbl tg-lbl-now">→ новый текст</div>
       </div>`;
     } else if (m.event === "view_once") {
-      return `<div class="tg-bub ${side}">
+      return `${dateSep}<div class="tg-bub ${side}">
         ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}
         ${media || '<div class="tg-bub-media">📷 медиа</div>'}
         <div class="tg-bub-lbl tg-lbl-vo">👁 одноразовое ${m.time}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>`;
     }
-    return "";
+    return dateSep;
   }).join("");
+  el.innerHTML = html;
   el.scrollTop = el.scrollHeight;
 }
 

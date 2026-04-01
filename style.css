@@ -1028,15 +1028,23 @@ body {
 
 /* Filters */
 .tg-filters {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap;
   gap: 8px;
   padding: 8px 16px 12px;
   overflow-x: auto;
+  overflow-y: hidden;
   flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .tg-filters::-webkit-scrollbar { display: none; }
 .tg-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 7px 16px;
   border-radius: 20px;
   background: rgba(255,255,255,0.06);
@@ -1078,12 +1086,32 @@ body {
 
 /* Avatar */
 .tg-av {
-  width: 54px; height: 54px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 21px; font-weight: 600; color: #fff;
-  flex-shrink: 0; margin-right: 12px; position: relative;
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  min-height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+  margin-right: 12px;
+  position: relative;
+  background: linear-gradient(135deg, #6EC6FF, #2196F3);
+  -webkit-background-size: cover;
+  background-size: cover;
 }
-.tg-av-sm { width: 38px; height: 38px; font-size: 16px; margin-right: 10px; }
+.tg-av-sm {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  font-size: 16px;
+  margin-right: 10px;
+}
 
 .tg-chat-body { flex: 1; min-width: 0; }
 .tg-row-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
@@ -1218,8 +1246,8 @@ body {
   font-size: 14px; color: rgba(255,255,255,0.45); font-style: italic; padding: 2px 0;
 }
 
-.tg-arrow { color: rgba(255,255,255,0.12); font-size: 14px; margin: 0 0 0 12px; }
-.tg-arrow.tg-bub-right { text-align: right; margin: 0 12px 0 0; }
+.tg-arrow { color: rgba(255,255,255,0.12); font-size: 14px; margin: 0 0 0 12px; background: none; }
+.tg-arrow.tg-arrow-right { text-align: right; margin: 0 12px 0 0; }
 
 /* Bottom bar */
 .tg-chat-bottom {
