@@ -93,6 +93,34 @@
       </div>
 
       <div class="section">
+        <div class="section-title">Задержка ответа</div>
+        <div class="card">
+          <div class="slider-row">
+            <div class="slider-info">
+              <div class="toggle-label">Задержка</div>
+              <div class="toggle-desc">Бот ждёт перед ответом (±30%)</div>
+            </div>
+            <div class="slider-value" id="delay-value">0с</div>
+          </div>
+          <input type="range" class="slider" id="delay-slider" min="0" max="120" step="5" value="0">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Автоочистка контекста</div>
+        <div class="card">
+          <div class="slider-row">
+            <div class="slider-info">
+              <div class="toggle-label">Забывать через</div>
+              <div class="toggle-desc">Бот забудет разговор через N часов</div>
+            </div>
+            <div class="slider-value" id="ttl-value">∞</div>
+          </div>
+          <input type="range" class="slider" id="ttl-slider" min="0" max="72" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-title">Модель</div>
         <div class="items-grid" id="models-list"></div>
       </div>
@@ -144,6 +172,23 @@
           <button class="quick-test-btn" data-msg="пойдем гулять">пойдем гулять</button>
           <button class="quick-test-btn" data-msg="ты кто">ты кто</button>
           <button class="quick-test-btn" data-msg="иди нахуй">иди нахуй</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Последние ответы</div>
+        <div id="reply-log" class="reply-log">
+          <div class="log-empty">Пока нет ответов</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Чёрный список</div>
+        <div id="blacklist" class="blacklist-list"></div>
+        <div class="blacklist-add">
+          <input type="text" id="blacklist-input" placeholder="Chat ID" autocomplete="off">
+          <input type="text" id="blacklist-name" placeholder="Имя" autocomplete="off">
+          <button class="test-send-btn" id="blacklist-add-btn">+</button>
         </div>
       </div>
 

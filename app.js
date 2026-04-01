@@ -33,7 +33,7 @@ function initTabs() {
       document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
       tab.classList.add("active");
       document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
-      if (tab.dataset.tab === "tests") loadChatStats();
+      if (tab.dataset.tab === "tests") { loadChatStats(); loadReplyLog(); loadBlacklist(); }
       if (tg) tg.HapticFeedback?.impactOccurred("light");
     });
   });
@@ -51,6 +51,16 @@ function render() {
 
   document.getElementById("toggle-auto").checked = state.auto_reply;
   document.getElementById("toggle-learn").checked = state.learning;
+
+  // Delay slider
+  const delaySlider = document.getElementById("delay-slider");
+  delaySlider.value = state.reply_delay || 0;
+  document.getElementById("delay-value").textContent = (state.reply_delay || 0) + "с";
+
+  // TTL slider
+  const ttlSlider = document.getElementById("ttl-slider");
+  ttlSlider.value = state.context_ttl || 0;
+  document.getElementById("ttl-value").textContent = (state.context_ttl || 0) > 0 ? (state.context_ttl + "ч") : "∞";
 
   // Voice toggle — show only if configured
   const voiceCard = document.getElementById("voice-card");
@@ -290,6 +300,107 @@ async function clearMemory() {
   }
 }
 
+// === Delay & TTL ===
+
+let delayTimer = null;
+let ttlTimer = null;
+
+function initSliders() {
+  const delaySlider = document.getElementById("delay-slider");
+  const ttlSlider = document.getElementById("ttl-slider");
+
+  delaySlider.addEventListener("input", (e) => {
+    const v = parseInt(e.target.value);
+    document.getElementById("delay-value").textContent = v + "с";
+    clearTimeout(delayTimer);
+    delayTimer = setTimeout(() => {
+      api("/api/delay", "POST", { seconds: v });
+      if (tg) tg.HapticFeedback?.impactOccurred("light");
+    }, 500);
+  });
+
+  ttlSlider.addEventListener("input", (e) => {
+    const v = parseInt(e.target.value);
+    document.getElementById("ttl-value").textContent = v > 0 ? (v + "ч") : "∞";
+    clearTimeout(ttlTimer);
+    ttlTimer = setTimeout(() => {
+      api("/api/context-ttl", "POST", { hours: v });
+      if (tg) tg.HapticFeedback?.impactOccurred("light");
+    }, 500);
+  });
+}
+
+// === Blacklist ===
+
+async function loadBlacklist() {
+  try {
+    const res = await api("/api/blacklist");
+    renderBlacklist(res.blacklist || []);
+  } catch (e) {}
+}
+
+function renderBlacklist(list) {
+  const el = document.getElementById("blacklist");
+  if (!list.length) {
+    el.innerHTML = '<div class="log-empty">Список пуст</div>';
+    return;
+  }
+  el.innerHTML = list.map(item => `
+    <div class="blacklist-entry">
+      <div class="blacklist-info">
+        <div class="blacklist-name">${item.name || "Без имени"}</div>
+        <div class="blacklist-id">${item.chat_id}</div>
+      </div>
+      <button class="blacklist-remove" data-id="${item.chat_id}">✕</button>
+    </div>
+  `).join("");
+  el.querySelectorAll(".blacklist-remove").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      await api("/api/blacklist/remove", "POST", { chat_id: parseInt(btn.dataset.id) });
+      if (tg) tg.HapticFeedback?.notificationOccurred("warning");
+      loadBlacklist();
+    });
+  });
+}
+
+async function addToBlacklist() {
+  const chatId = document.getElementById("blacklist-input").value.trim();
+  const name = document.getElementById("blacklist-name").value.trim();
+  if (!chatId) return;
+  await api("/api/blacklist/add", "POST", { chat_id: parseInt(chatId), name });
+  document.getElementById("blacklist-input").value = "";
+  document.getElementById("blacklist-name").value = "";
+  if (tg) tg.HapticFeedback?.notificationOccurred("success");
+  loadBlacklist();
+}
+
+// === Reply Log ===
+
+async function loadReplyLog() {
+  try {
+    const res = await api("/api/reply-log");
+    renderReplyLog(res.log || []);
+  } catch (e) {}
+}
+
+function renderReplyLog(log) {
+  const el = document.getElementById("reply-log");
+  if (!log.length) {
+    el.innerHTML = '<div class="log-empty">Пока нет ответов</div>';
+    return;
+  }
+  el.innerHTML = log.map(item => `
+    <div class="log-entry">
+      <div class="log-header">
+        <div class="log-name">${item.name}</div>
+        <div class="log-time">${item.time}</div>
+      </div>
+      <div class="log-incoming">→ ${item.incoming}</div>
+      <div class="log-reply">← ${item.reply}</div>
+    </div>
+  `).join("");
+}
+
 // === Test Functions ===
 
 async function testReply(text) {
@@ -365,6 +476,7 @@ document.querySelectorAll(".quick-test-btn").forEach(btn => {
 });
 
 document.getElementById("clear-history-btn").addEventListener("click", clearChatHistory);
+document.getElementById("blacklist-add-btn").addEventListener("click", addToBlacklist);
 
 document.getElementById("analyze-btn").addEventListener("click", async () => {
   const btn = document.getElementById("analyze-btn");
@@ -417,6 +529,7 @@ document.getElementById("profile-input").addEventListener("keydown", (e) => {
 // === Init ===
 
 initTabs();
+initSliders();
 
 if (tg) {
   tg.ready();
