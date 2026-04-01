@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>AI Autoresponder</title>
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -256,7 +256,69 @@
       <div class="tg-bottom-bar" id="tg-bottom-bar">        <button class="tg-tab-btn tg-tab-active" id="tg-tab-chats" data-screen="list">          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>          <span>Чаты</span>        </button>        <button class="tg-tab-btn" id="tg-tab-settings" data-screen="settings">          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>          <span>Настройки</span>        </button>      </div>    </div>
     </div>
 
-    <!-- Screen 3: Settings -->    <div id="tg-screen-settings" class="tg-screen tg-hidden">      <div class="tg-topbar">        <div></div>        <div class="tg-topbar-center">          <span class="tg-topbar-title">Настройки</span>        </div>        <button class="tg-topbar-btn" id="tg-settings-edit">Изм.</button>      </div>      <div class="tg-settings-scroll">        <div class="tg-settings-profile">          <div class="tg-settings-avatar" id="tg-settings-av"></div>          <div class="tg-settings-name" id="tg-settings-name"></div>          <div class="tg-settings-username" id="tg-settings-uname"></div>        </div>        <div class="tg-settings-group">          <div class="tg-settings-row">            <div class="tg-settings-icon" style="background:#34C759">🛡</div>            <div class="tg-settings-row-body">              <span>Антиудаление</span>              <label class="tg-toggle-wrap tg-toggle-sm">                <input type="checkbox" id="toggle-tgdel-settings">                <div class="tg-toggle-track"></div>                <div class="tg-toggle-thumb"></div>              </label>            </div>          </div>        </div>        <div class="tg-settings-group">          <div class="tg-settings-row" id="tg-clear-history">            <div class="tg-settings-icon" style="background:#FF453A">🗑</div>            <div class="tg-settings-row-body">              <span>Очистить историю</span>              <span class="tg-settings-arrow">›</span>            </div>          </div>          <div class="tg-settings-row" id="tg-exit3">            <div class="tg-settings-icon" style="background:#a78bfa">↩</div>            <div class="tg-settings-row-body">              <span>Вернуться в бота</span>              <span class="tg-settings-arrow">›</span>            </div>          </div>        </div>        <div class="tg-settings-footer">          TGDel v5 · Ai Bot        </div>      </div>      <div class="tg-bottom-bar">        <button class="tg-tab-btn" data-screen="list">          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>          <span>Чаты</span>        </button>        <button class="tg-tab-btn tg-tab-active" data-screen="settings">          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>          <span>Настройки</span>        </button>      </div>    </div>
+    <!-- Screen 3: Settings -->
+    <div id="tg-screen-settings" class="tg-screen tg-hidden">
+      <div class="tg-topbar">
+        <div></div>
+        <div class="tg-topbar-center">
+          <span class="tg-topbar-title">Настройки</span>
+        </div>
+        <button class="tg-topbar-btn" id="tg-settings-edit">Изм.</button>
+      </div>
+
+      <div class="tg-settings-scroll">
+        <div class="tg-settings-profile">
+          <div class="tg-settings-avatar" id="tg-settings-av"></div>
+          <div class="tg-settings-name" id="tg-settings-name"></div>
+          <div class="tg-settings-username" id="tg-settings-uname"></div>
+        </div>
+
+        <div class="tg-settings-group">
+          <div class="tg-settings-row">
+            <div class="tg-settings-icon" style="background:#34C759">&#x1f6e1;</div>
+            <div class="tg-settings-row-body">
+              <span>Антиудаление</span>
+              <label class="tg-toggle-wrap tg-toggle-sm">
+                <input type="checkbox" id="toggle-tgdel-settings">
+                <div class="tg-toggle-track"></div>
+                <div class="tg-toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="tg-settings-group">
+          <div class="tg-settings-row" id="tg-clear-history">
+            <div class="tg-settings-icon" style="background:#FF453A">&#x1f5d1;</div>
+            <div class="tg-settings-row-body">
+              <span>Очистить историю</span>
+              <span class="tg-settings-arrow">&#x203a;</span>
+            </div>
+          </div>
+          <div class="tg-settings-row" id="tg-exit3">
+            <div class="tg-settings-icon" style="background:#a78bfa">&#x21a9;</div>
+            <div class="tg-settings-row-body">
+              <span>Вернуться в бота</span>
+              <span class="tg-settings-arrow">&#x203a;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tg-settings-footer">TGDel v5</div>
+      </div>
+
+      <div class="tg-bottom-bar">
+        <button class="tg-tab-btn" data-screen="list">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Чаты</span>
+        </button>
+        <button class="tg-tab-btn tg-tab-active" data-screen="settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span>Настройки</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Screen 2: Chat view -->
     <div id="tg-screen-chat" class="tg-screen tg-offscreen-right">
       <div class="tg-chat-topbar">
@@ -310,6 +372,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>
