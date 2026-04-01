@@ -213,9 +213,33 @@
 
     <!-- Tab: TGDel -->
     <div class="tab-content" id="tab-tgdel">
-      <div class="section" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px">
-        <div style="font-size:40px;margin-bottom:16px;opacity:0.15">🚧</div>
-        <div style="font-size:15px;color:var(--text-3);text-align:center">Скоро здесь будет кое-что интересное</div>
+      <!-- Screen 1: Chat list -->
+      <div id="tgdel-list" class="tgdel-screen">
+        <div class="tgdel-header">
+          <div class="tgdel-title">TGDel</div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-tgdel">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div id="tgdel-chats" class="tgdel-chats">
+          <div class="tgdel-empty">
+            <div class="tgdel-empty-icon">🗑</div>
+            <div>Удалённых сообщений нет</div>
+            <div class="tgdel-empty-sub">Включи TGDel и жди</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Chat messages -->
+      <div id="tgdel-chat" class="tgdel-screen tgdel-hidden">
+        <div class="tgdel-chat-header">
+          <button class="tgdel-back" id="tgdel-back">←</button>
+          <div class="tgdel-chat-avatar" id="tgdel-chat-avatar"></div>
+          <div class="tgdel-chat-name" id="tgdel-chat-name"></div>
+        </div>
+        <div id="tgdel-messages" class="tgdel-messages"></div>
       </div>
     </div>
 

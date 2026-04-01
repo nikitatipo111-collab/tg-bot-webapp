@@ -34,6 +34,7 @@ function initTabs() {
       tab.classList.add("active");
       document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
       if (tab.dataset.tab === "tests") { loadChatStats(); loadReplyLog(); loadBlacklist(); }
+      if (tab.dataset.tab === "tgdel") { loadTGDelChats(); }
       if (tg) tg.HapticFeedback?.impactOccurred("light");
     });
   });
@@ -477,6 +478,11 @@ document.querySelectorAll(".quick-test-btn").forEach(btn => {
 
 document.getElementById("clear-history-btn").addEventListener("click", clearChatHistory);
 document.getElementById("blacklist-add-btn").addEventListener("click", addToBlacklist);
+document.getElementById("tgdel-back").addEventListener("click", closeTGDelChat);
+document.getElementById("toggle-tgdel").addEventListener("change", (e) => {
+  api("/api/tgdel/toggle", "POST", { enabled: e.target.checked });
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+});
 
 document.getElementById("analyze-btn").addEventListener("click", async () => {
   const btn = document.getElementById("analyze-btn");
@@ -525,6 +531,146 @@ document.getElementById("modal-create").addEventListener("click", async () => {
 document.getElementById("profile-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") document.getElementById("modal-create").click();
 });
+
+// === TGDel ===
+
+const AVATAR_GRADIENTS = [
+  "linear-gradient(135deg, #FF885E, #FF516A)",
+  "linear-gradient(135deg, #FFD54F, #FF9800)",
+  "linear-gradient(135deg, #76C84D, #53B917)",
+  "linear-gradient(135deg, #6EC6FF, #2196F3)",
+  "linear-gradient(135deg, #B39DDB, #7C4DFF)",
+  "linear-gradient(135deg, #F06292, #EC407A)",
+];
+
+function getAvatarStyle(chatId) {
+  const idx = Math.abs(chatId) % AVATAR_GRADIENTS.length;
+  return AVATAR_GRADIENTS[idx];
+}
+
+function getInitial(name) {
+  return (name || "?").charAt(0).toUpperCase();
+}
+
+let tgdelCurrentChat = null;
+
+async function loadTGDelChats() {
+  try {
+    const res = await api("/api/tgdel/chats");
+    document.getElementById("toggle-tgdel").checked = res.enabled;
+    renderTGDelChats(res.chats || []);
+  } catch (e) {}
+}
+
+function renderTGDelChats(chats) {
+  const el = document.getElementById("tgdel-chats");
+  if (!chats.length) {
+    el.innerHTML = `
+      <div class="tgdel-empty">
+        <div class="tgdel-empty-icon">🗑</div>
+        <div>Удалённых сообщений нет</div>
+        <div class="tgdel-empty-sub">Включи TGDel и жди</div>
+      </div>`;
+    return;
+  }
+  el.innerHTML = chats.map(c => {
+    const typeLabel = c.last_type === "edited" ? "✏️ " : c.last_type === "view_once" ? "👁 " : "";
+    const preview = typeLabel + (c.last_text || "медиа").substring(0, 40);
+    return `
+    <div class="tgdel-chat-item" data-chatid="${c.chat_id}" data-name="${c.name}">
+      <div class="tgdel-avatar" style="background:${getAvatarStyle(c.chat_id)}">${getInitial(c.name)}</div>
+      <div class="tgdel-chat-body">
+        <div class="tgdel-chat-top">
+          <div class="tgdel-chat-item-name">${c.name}</div>
+          <div class="tgdel-chat-time">${c.last_time}</div>
+        </div>
+        <div class="tgdel-chat-bottom">
+          <div class="tgdel-chat-preview">${preview}</div>
+          <div class="tgdel-chat-badge">${c.count}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  el.querySelectorAll(".tgdel-chat-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const chatId = parseInt(item.dataset.chatid);
+      const name = item.dataset.name;
+      openTGDelChat(chatId, name);
+    });
+  });
+}
+
+async function openTGDelChat(chatId, name) {
+  tgdelCurrentChat = chatId;
+  document.getElementById("tgdel-list").classList.add("tgdel-hidden");
+  document.getElementById("tgdel-chat").classList.remove("tgdel-hidden");
+
+  const avatar = document.getElementById("tgdel-chat-avatar");
+  avatar.style.background = getAvatarStyle(chatId);
+  avatar.textContent = getInitial(name);
+  document.getElementById("tgdel-chat-name").textContent = name;
+
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+
+  try {
+    const res = await api(`/api/tgdel/messages?chat_id=${chatId}`);
+    renderTGDelMessages(res.messages || []);
+  } catch (e) {
+    document.getElementById("tgdel-messages").innerHTML = '<div class="tgdel-empty">Ошибка загрузки</div>';
+  }
+}
+
+function renderTGDelMessages(messages) {
+  const el = document.getElementById("tgdel-messages");
+  if (!messages.length) {
+    el.innerHTML = '<div class="tgdel-empty" style="min-height:200px">Нет событий</div>';
+    return;
+  }
+  el.innerHTML = messages.map(m => {
+    const mediaLabel = m.msg_type !== "text" ? `<div class="tgdel-bubble-media">📎 ${m.msg_type}</div>` : "";
+
+    if (m.event === "deleted") {
+      return `
+        <div class="tgdel-bubble tgdel-bubble-deleted">
+          <div class="tgdel-bubble-label tgdel-label-deleted">УДАЛЕНО</div>
+          ${m.original ? `<div class="tgdel-bubble-text">${m.original}</div>` : ""}
+          ${mediaLabel}
+          <div class="tgdel-bubble-time">${m.time}</div>
+        </div>`;
+    } else if (m.event === "edited") {
+      return `
+        <div class="tgdel-bubble tgdel-bubble-edited-old">
+          <div class="tgdel-bubble-label tgdel-label-was">БЫЛО</div>
+          <div class="tgdel-bubble-text strikethrough">${m.original || ""}</div>
+          <div class="tgdel-bubble-time">${m.time}</div>
+        </div>
+        <div class="tgdel-arrow">↓</div>
+        <div class="tgdel-bubble tgdel-bubble-edited-new">
+          <div class="tgdel-bubble-label tgdel-label-now">СТАЛО</div>
+          <div class="tgdel-bubble-text">${m.new_text || ""}</div>
+        </div>`;
+    } else if (m.event === "view_once") {
+      return `
+        <div class="tgdel-bubble tgdel-bubble-viewonce">
+          <div class="tgdel-bubble-label tgdel-label-viewonce">ОДНОРАЗОВОЕ</div>
+          ${m.original ? `<div class="tgdel-bubble-text">${m.original}</div>` : ""}
+          ${mediaLabel || '<div class="tgdel-bubble-media">📷 медиа</div>'}
+          <div class="tgdel-bubble-time">${m.time}</div>
+        </div>`;
+    }
+    return "";
+  }).join("");
+
+  el.scrollTop = el.scrollHeight;
+}
+
+function closeTGDelChat() {
+  document.getElementById("tgdel-chat").classList.add("tgdel-hidden");
+  document.getElementById("tgdel-list").classList.remove("tgdel-hidden");
+  tgdelCurrentChat = null;
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+}
 
 // === Init ===
 
