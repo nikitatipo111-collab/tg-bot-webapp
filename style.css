@@ -1186,37 +1186,53 @@ body {
 .tg-empty-text { font-size: 16px; color: #8E8E93; }
 .tg-empty-sub { font-size: 13px; color: #48484A; }
 
-/* === Chat view === */
+/* === Chat view — Telegram exact clone === */
 
 .tg-chat-topbar {
   display: flex;
   align-items: center;
-  padding: 6px 8px;
+  padding: 6px 12px;
   min-height: 44px;
   flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 0.33px solid rgba(255,255,255,0.08);
+  z-index: 10;
 }
 
 .tg-chat-back {
   background: none;
   border: none;
-  color: #a78bfa;
-  font-size: 32px;
   cursor: pointer;
-  padding: 0 8px 0 0;
-  line-height: 1;
+  padding: 6px 8px 6px 0;
+  display: flex;
+  align-items: center;
 }
 
 .tg-chat-info {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
+}
+
+.tg-chat-title-wrap {
+  display: flex;
+  flex-direction: column;
 }
 
 .tg-chat-title {
   font-size: 17px;
   font-weight: 600;
   color: #fff;
+  line-height: 1.2;
+}
+
+.tg-chat-subtitle {
+  font-size: 13px;
+  color: #8E8E93;
+  line-height: 1.2;
 }
 
 /* Messages area */
@@ -1224,82 +1240,112 @@ body {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 12px 16px 20px;
+  padding: 10px 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-/* Bubbles */
+/* Bubbles — Telegram style */
 .tg-bub {
-  max-width: 82%;
-  border-radius: 18px;
-  padding: 7px 12px 4px;
+  max-width: 78%;
+  border-radius: 18px 18px 18px 4px;
+  padding: 6px 10px 3px;
+  position: relative;
+  align-self: flex-start;
 }
 
 .tg-bub-del {
-  background: rgba(255, 69, 58, 0.10);
-  border: 1px solid rgba(255, 69, 58, 0.20);
+  background: #1A1012;
+  border: 1px solid rgba(255, 69, 58, 0.35);
 }
 
 .tg-bub-old {
-  background: rgba(255, 159, 10, 0.10);
-  border: 1px solid rgba(255, 159, 10, 0.20);
+  background: #1A1508;
+  border: 1px solid rgba(255, 159, 10, 0.35);
 }
 
 .tg-bub-new {
-  background: rgba(52, 199, 89, 0.10);
-  border: 1px solid rgba(52, 199, 89, 0.20);
-  margin-top: 4px;
+  background: #0A1A0D;
+  border: 1px solid rgba(52, 199, 89, 0.35);
+  margin-top: 2px;
 }
 
 .tg-bub-vo {
-  background: rgba(175, 82, 222, 0.10);
-  border: 1px solid rgba(175, 82, 222, 0.20);
+  background: #150D1A;
+  border: 1px solid rgba(175, 82, 222, 0.35);
 }
 
 .tg-bub-lbl {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .tg-lbl-del { color: #ff453a; }
+.tg-lbl-del::before { content: "🗑"; font-size: 10px; }
 .tg-lbl-was { color: #ff9f0a; }
+.tg-lbl-was::before { content: "✏️"; font-size: 10px; }
 .tg-lbl-now { color: #34c759; }
+.tg-lbl-now::before { content: "→"; }
 .tg-lbl-vo { color: #af52de; }
+.tg-lbl-vo::before { content: "👁"; font-size: 10px; }
 
 .tg-bub-txt {
   font-size: 16px;
-  color: rgba(255,255,255,0.9);
-  line-height: 1.35;
+  color: #fff;
+  line-height: 1.4;
   word-wrap: break-word;
 }
 
 .tg-bub-txt.strike {
   text-decoration: line-through;
-  opacity: 0.55;
+  color: rgba(255,255,255,0.5);
 }
 
 .tg-bub-time {
   font-size: 11px;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.35);
   text-align: right;
-  margin-top: 2px;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 
 .tg-bub-media {
   font-size: 14px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.5);
   font-style: italic;
   padding: 2px 0;
 }
 
 .tg-arrow {
   color: rgba(255,255,255,0.15);
-  text-align: center;
-  font-size: 18px;
-  margin: 2px 0;
+  font-size: 14px;
+  margin: 0 0 0 12px;
+}
+
+/* Bottom fake input bar */
+.tg-chat-bottom {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.33px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.tg-input-fake {
+  flex: 1;
+  background: #1C1C1E;
+  border-radius: 18px;
+  padding: 8px 16px;
+  font-size: 16px;
+  color: #8E8E93;
 }
