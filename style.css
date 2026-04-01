@@ -1404,3 +1404,89 @@ body {
 .tg-input-right {
   display: flex; align-items: center; gap: 2px;
 }
+
+/* ============================================
+   TGDel Settings — Telegram Clone
+   ============================================ */
+
+#tg-screen-settings { z-index: 1; }
+
+.tg-settings-scroll {
+  flex: 1; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #0E0E0E;
+  padding-bottom: 20px;
+}
+
+/* Profile header */
+.tg-settings-profile {
+  display: flex; flex-direction: column;
+  align-items: center; padding: 20px 16px 24px;
+}
+.tg-settings-avatar {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: linear-gradient(135deg, #6EC6FF, #2196F3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 600; color: #fff;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.tg-settings-avatar img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+.tg-settings-name {
+  font-size: 22px; font-weight: 600; color: #fff;
+  margin-bottom: 2px;
+}
+.tg-settings-username {
+  font-size: 15px; color: #8E8E93;
+}
+
+/* Settings groups */
+.tg-settings-group {
+  margin: 8px 16px;
+  background: #1C1C1E;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.tg-settings-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px; cursor: pointer;
+  position: relative;
+}
+.tg-settings-row:active { background: rgba(255,255,255,0.04); }
+.tg-settings-row + .tg-settings-row::before {
+  content: ''; position: absolute;
+  top: 0; left: 54px; right: 0;
+  height: 0.5px; background: rgba(255,255,255,0.06);
+}
+.tg-settings-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.tg-settings-row-body {
+  flex: 1; display: flex; align-items: center;
+  justify-content: space-between;
+  font-size: 16px; color: #fff;
+}
+.tg-settings-arrow {
+  color: #8E8E93; font-size: 20px; font-weight: 300;
+}
+
+/* Toggle inside settings */
+.tg-toggle-sm {
+  width: 42px; height: 26px;
+}
+.tg-toggle-sm .tg-toggle-thumb {
+  width: 22px; height: 22px;
+}
+.tg-toggle-sm input:checked ~ .tg-toggle-thumb {
+  transform: translateX(16px);
+}
+
+/* Footer */
+.tg-settings-footer {
+  text-align: center; padding: 24px 16px;
+  font-size: 13px; color: #3A3A4A;
+}

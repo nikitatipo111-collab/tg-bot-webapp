@@ -581,6 +581,8 @@ function closeTGDel() {
   document.body.style.overflow = "";
   // Reset to list screen
   document.getElementById("tg-screen-chat").classList.add("tg-offscreen-right");
+  document.getElementById("tg-screen-settings").classList.add("tg-hidden");
+  document.getElementById("tg-screen-list").classList.remove("tg-hidden");
   // Reset filter
   tgActiveFilter = "all";
   document.querySelectorAll(".tg-filter").forEach(f => f.classList.remove("active"));
@@ -701,6 +703,8 @@ async function openTGChat(chatId, name) {
 
 function closeTGChat() {
   document.getElementById("tg-screen-chat").classList.add("tg-offscreen-right");
+  document.getElementById("tg-screen-settings").classList.add("tg-hidden");
+  document.getElementById("tg-screen-list").classList.remove("tg-hidden");
   if (tg) tg.HapticFeedback?.impactOccurred("light");
 }
 
@@ -851,8 +855,53 @@ function renderTGMsgs(msgs) {
   el.scrollTop = el.scrollHeight;
 }
 
+// === TGDel Tab navigation ===
+unction tgSwitchScreen(screenName) {
+  const list = document.getElementById("tg-screen-list");
+  const settings = document.getElementById("tg-screen-settings");
+  if (screenName === "list") {
+    list.classList.remove("tg-hidden");
+    settings.classList.add("tg-hidden");
+  } else if (screenName === "settings") {
+    list.classList.add("tg-hidden");
+    settings.classList.remove("tg-hidden");
+    fillTGSettings();
+  }
+  // Update all tab buttons across screens
+  document.querySelectorAll(".tg-tab-btn[data-screen]").forEach(btn => {
+    btn.classList.toggle("tg-tab-active", btn.dataset.screen === screenName);
+  });
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+}
+
+unction fillTGSettings() {
+  const user = tg?.initDataUnsafe?.user;
+  const av = document.getElementById("tg-settings-av");
+  const name = document.getElementById("tg-settings-name");
+  const uname = document.getElementById("tg-settings-uname");
+  if (user) {
+    const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ");
+    name.textContent = fullName || "User";
+    uname.textContent = user.username ? "@" + user.username : "";
+    if (user.photo_url) {
+      av.innerHTML = `<img src="${user.photo_url}" alt="">`;
+    } else {
+      av.textContent = (fullName || "U").charAt(0).toUpperCase();
+    }
+  } else {
+    name.textContent = "TGDel User";
+    uname.textContent = "";
+    av.textContent = "U";
+  }
+  // Sync toggle
+  const mainToggle = document.getElementById("toggle-tgdel");
+  const settingsToggle = document.getElementById("toggle-tgdel-settings");
+  if (mainToggle && settingsToggle) settingsToggle.checked = mainToggle.checked;
+}
+
 // === Init ===
 
+// TGDel tab buttonsdocument.querySelectorAll(".tg-tab-btn[data-screen]").forEach(btn => {  btn.addEventListener("click", () => tgSwitchScreen(btn.dataset.screen));});// Settings toggle syncdocument.getElementById("toggle-tgdel-settings")?.addEventListener("change", async (e) => {  const enabled = e.target.checked;  document.getElementById("toggle-tgdel").checked = enabled;  await api("/api/tgdel/toggle", "POST", { enabled });});// Clear historydocument.getElementById("tg-clear-history")?.addEventListener("click", async () => {  if (confirm("Очистить всю историю удалённых сообщений?")) {    await api("/api/tgdel/clear", "POST");    loadTGChats();    tgSwitchScreen("list");  }});// Exit from settingsdocument.getElementById("tg-exit3")?.addEventListener("click", closeTGDel);
 initTabs();
 initSliders();
 
