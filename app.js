@@ -34,7 +34,7 @@ function initTabs() {
       tab.classList.add("active");
       document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
       if (tab.dataset.tab === "tests") { loadChatStats(); loadReplyLog(); loadBlacklist(); }
-      if (tab.dataset.tab === "tgdel") { loadTGDelChats(); }
+      if (tab.dataset.tab === "tgdel") { openTGDel(); return; }
       if (tg) tg.HapticFeedback?.impactOccurred("light");
     });
   });
@@ -478,7 +478,8 @@ document.querySelectorAll(".quick-test-btn").forEach(btn => {
 
 document.getElementById("clear-history-btn").addEventListener("click", clearChatHistory);
 document.getElementById("blacklist-add-btn").addEventListener("click", addToBlacklist);
-document.getElementById("tgdel-back").addEventListener("click", closeTGDelChat);
+document.getElementById("tg-exit").addEventListener("click", closeTGDel);
+document.getElementById("tg-chat-back").addEventListener("click", closeTGChat);
 document.getElementById("toggle-tgdel").addEventListener("change", (e) => {
   api("/api/tgdel/toggle", "POST", { enabled: e.target.checked });
   if (tg) tg.HapticFeedback?.impactOccurred("light");
@@ -532,9 +533,9 @@ document.getElementById("profile-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") document.getElementById("modal-create").click();
 });
 
-// === TGDel ===
+// === TGDel — Fullscreen Telegram Clone ===
 
-const AVATAR_GRADIENTS = [
+const TG_GRADIENTS = [
   "linear-gradient(135deg, #FF885E, #FF516A)",
   "linear-gradient(135deg, #FFD54F, #FF9800)",
   "linear-gradient(135deg, #76C84D, #53B917)",
@@ -543,133 +544,137 @@ const AVATAR_GRADIENTS = [
   "linear-gradient(135deg, #F06292, #EC407A)",
 ];
 
-function getAvatarStyle(chatId) {
-  const idx = Math.abs(chatId) % AVATAR_GRADIENTS.length;
-  return AVATAR_GRADIENTS[idx];
+function tgAvStyle(id) { return TG_GRADIENTS[Math.abs(id) % TG_GRADIENTS.length]; }
+function tgInitial(n) { return (n || "?").charAt(0).toUpperCase(); }
+
+function openTGDel() {
+  document.getElementById("tg-app").classList.remove("tg-hidden");
+  document.getElementById("app").style.display = "none";
+  document.querySelector(".aurora").style.display = "none";
+  loadTGChats();
+  if (tg) tg.HapticFeedback?.impactOccurred("medium");
 }
 
-function getInitial(name) {
-  return (name || "?").charAt(0).toUpperCase();
+function closeTGDel() {
+  document.getElementById("tg-app").classList.add("tg-hidden");
+  document.getElementById("app").style.display = "block";
+  document.querySelector(".aurora").style.display = "";
+  // Reset to list screen
+  document.getElementById("tg-screen-chat").classList.add("tg-offscreen-right");
+  // Switch back to main tab
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  document.querySelector('[data-tab="main"]').classList.add("active");
+  document.getElementById("tab-main").classList.add("active");
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
 }
 
-let tgdelCurrentChat = null;
-
-async function loadTGDelChats() {
+async function loadTGChats() {
   try {
     const res = await api("/api/tgdel/chats");
     document.getElementById("toggle-tgdel").checked = res.enabled;
-    renderTGDelChats(res.chats || []);
+    renderTGChats(res.chats || []);
   } catch (e) {}
 }
 
-function renderTGDelChats(chats) {
-  const el = document.getElementById("tgdel-chats");
+function renderTGChats(chats) {
+  const el = document.getElementById("tg-chat-list");
   if (!chats.length) {
     el.innerHTML = `
-      <div class="tgdel-empty">
-        <div class="tgdel-empty-icon">🗑</div>
-        <div>Удалённых сообщений нет</div>
-        <div class="tgdel-empty-sub">Включи TGDel и жди</div>
+      <div class="tg-empty">
+        <div class="tg-empty-icon">🗑️</div>
+        <div class="tg-empty-text">Удалённых сообщений нет</div>
+        <div class="tg-empty-sub">Включи TGDel и жди</div>
       </div>`;
     return;
   }
   el.innerHTML = chats.map(c => {
-    const typeLabel = c.last_type === "edited" ? "✏️ " : c.last_type === "view_once" ? "👁 " : "";
-    const preview = typeLabel + (c.last_text || "медиа").substring(0, 40);
+    const icon = c.last_type === "edited" ? "✏️ " : c.last_type === "view_once" ? "👁 " : "🗑 ";
+    const prev = (c.last_text || "медиа").substring(0, 45);
     return `
-    <div class="tgdel-chat-item" data-chatid="${c.chat_id}" data-name="${c.name}">
-      <div class="tgdel-avatar" style="background:${getAvatarStyle(c.chat_id)}">${getInitial(c.name)}</div>
-      <div class="tgdel-chat-body">
-        <div class="tgdel-chat-top">
-          <div class="tgdel-chat-item-name">${c.name}</div>
-          <div class="tgdel-chat-time">${c.last_time}</div>
+    <div class="tg-chat-row" data-cid="${c.chat_id}" data-cname="${c.name}">
+      <div class="tg-av" style="background:${tgAvStyle(c.chat_id)}">${tgInitial(c.name)}</div>
+      <div class="tg-chat-body">
+        <div class="tg-row-top">
+          <div class="tg-chat-name">${c.name}</div>
+          <div class="tg-row-time">${c.last_time}</div>
         </div>
-        <div class="tgdel-chat-bottom">
-          <div class="tgdel-chat-preview">${preview}</div>
-          <div class="tgdel-chat-badge">${c.count}</div>
+        <div class="tg-row-bottom">
+          <div class="tg-row-preview">${icon}${prev}</div>
+          <div class="tg-row-badge red">${c.count}</div>
         </div>
       </div>
     </div>`;
   }).join("");
 
-  el.querySelectorAll(".tgdel-chat-item").forEach(item => {
-    item.addEventListener("click", () => {
-      const chatId = parseInt(item.dataset.chatid);
-      const name = item.dataset.name;
-      openTGDelChat(chatId, name);
+  el.querySelectorAll(".tg-chat-row").forEach(row => {
+    row.addEventListener("click", () => {
+      openTGChat(parseInt(row.dataset.cid), row.dataset.cname);
     });
   });
 }
 
-async function openTGDelChat(chatId, name) {
-  tgdelCurrentChat = chatId;
-  document.getElementById("tgdel-list").classList.add("tgdel-hidden");
-  document.getElementById("tgdel-chat").classList.remove("tgdel-hidden");
+async function openTGChat(chatId, name) {
+  const av = document.getElementById("tg-chat-av");
+  av.className = "tg-av tg-av-sm";
+  av.style.background = tgAvStyle(chatId);
+  av.textContent = tgInitial(name);
+  document.getElementById("tg-chat-title").textContent = name;
 
-  const avatar = document.getElementById("tgdel-chat-avatar");
-  avatar.style.background = getAvatarStyle(chatId);
-  avatar.textContent = getInitial(name);
-  document.getElementById("tgdel-chat-name").textContent = name;
-
+  // Slide in
+  document.getElementById("tg-screen-chat").classList.remove("tg-offscreen-right");
   if (tg) tg.HapticFeedback?.impactOccurred("light");
 
   try {
     const res = await api(`/api/tgdel/messages?chat_id=${chatId}`);
-    renderTGDelMessages(res.messages || []);
+    renderTGMsgs(res.messages || []);
   } catch (e) {
-    document.getElementById("tgdel-messages").innerHTML = '<div class="tgdel-empty">Ошибка загрузки</div>';
+    document.getElementById("tg-chat-msgs").innerHTML = '<div class="tg-empty"><div class="tg-empty-text">Ошибка</div></div>';
   }
 }
 
-function renderTGDelMessages(messages) {
-  const el = document.getElementById("tgdel-messages");
-  if (!messages.length) {
-    el.innerHTML = '<div class="tgdel-empty" style="min-height:200px">Нет событий</div>';
+function closeTGChat() {
+  document.getElementById("tg-screen-chat").classList.add("tg-offscreen-right");
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+}
+
+function renderTGMsgs(msgs) {
+  const el = document.getElementById("tg-chat-msgs");
+  if (!msgs.length) {
+    el.innerHTML = '<div class="tg-empty" style="height:100%"><div class="tg-empty-text">Пусто</div></div>';
     return;
   }
-  el.innerHTML = messages.map(m => {
-    const mediaLabel = m.msg_type !== "text" ? `<div class="tgdel-bubble-media">📎 ${m.msg_type}</div>` : "";
+  el.innerHTML = msgs.map(m => {
+    const media = m.msg_type !== "text" ? `<div class="tg-bub-media">📎 ${m.msg_type}</div>` : "";
 
     if (m.event === "deleted") {
-      return `
-        <div class="tgdel-bubble tgdel-bubble-deleted">
-          <div class="tgdel-bubble-label tgdel-label-deleted">УДАЛЕНО</div>
-          ${m.original ? `<div class="tgdel-bubble-text">${m.original}</div>` : ""}
-          ${mediaLabel}
-          <div class="tgdel-bubble-time">${m.time}</div>
-        </div>`;
+      return `<div class="tg-bub tg-bub-del">
+        <div class="tg-bub-lbl tg-lbl-del">УДАЛЕНО</div>
+        ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}${media}
+        <div class="tg-bub-time">${m.time}</div>
+      </div>`;
     } else if (m.event === "edited") {
-      return `
-        <div class="tgdel-bubble tgdel-bubble-edited-old">
-          <div class="tgdel-bubble-label tgdel-label-was">БЫЛО</div>
-          <div class="tgdel-bubble-text strikethrough">${m.original || ""}</div>
-          <div class="tgdel-bubble-time">${m.time}</div>
-        </div>
-        <div class="tgdel-arrow">↓</div>
-        <div class="tgdel-bubble tgdel-bubble-edited-new">
-          <div class="tgdel-bubble-label tgdel-label-now">СТАЛО</div>
-          <div class="tgdel-bubble-text">${m.new_text || ""}</div>
-        </div>`;
+      return `<div class="tg-bub tg-bub-old">
+        <div class="tg-bub-lbl tg-lbl-was">БЫЛО</div>
+        <div class="tg-bub-txt strike">${m.original || ""}</div>
+        <div class="tg-bub-time">${m.time}</div>
+      </div>
+      <div class="tg-arrow">↓</div>
+      <div class="tg-bub tg-bub-new">
+        <div class="tg-bub-lbl tg-lbl-now">СТАЛО</div>
+        <div class="tg-bub-txt">${m.new_text || ""}</div>
+      </div>`;
     } else if (m.event === "view_once") {
-      return `
-        <div class="tgdel-bubble tgdel-bubble-viewonce">
-          <div class="tgdel-bubble-label tgdel-label-viewonce">ОДНОРАЗОВОЕ</div>
-          ${m.original ? `<div class="tgdel-bubble-text">${m.original}</div>` : ""}
-          ${mediaLabel || '<div class="tgdel-bubble-media">📷 медиа</div>'}
-          <div class="tgdel-bubble-time">${m.time}</div>
-        </div>`;
+      return `<div class="tg-bub tg-bub-vo">
+        <div class="tg-bub-lbl tg-lbl-vo">ОДНОРАЗОВОЕ</div>
+        ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}
+        ${media || '<div class="tg-bub-media">📷 медиа</div>'}
+        <div class="tg-bub-time">${m.time}</div>
+      </div>`;
     }
     return "";
   }).join("");
-
   el.scrollTop = el.scrollHeight;
-}
-
-function closeTGDelChat() {
-  document.getElementById("tgdel-chat").classList.add("tgdel-hidden");
-  document.getElementById("tgdel-list").classList.remove("tgdel-hidden");
-  tgdelCurrentChat = null;
-  if (tg) tg.HapticFeedback?.impactOccurred("light");
 }
 
 // === Init ===

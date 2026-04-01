@@ -211,37 +211,55 @@
       </div>
     </div>
 
-    <!-- Tab: TGDel -->
-    <div class="tab-content" id="tab-tgdel">
-      <!-- Screen 1: Chat list -->
-      <div id="tgdel-list" class="tgdel-screen">
-        <div class="tgdel-header">
-          <div class="tgdel-title">TGDel</div>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-tgdel">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <div id="tgdel-chats" class="tgdel-chats">
-          <div class="tgdel-empty">
-            <div class="tgdel-empty-icon">🗑</div>
-            <div>Удалённых сообщений нет</div>
-            <div class="tgdel-empty-sub">Включи TGDel и жди</div>
-          </div>
+    <!-- Tab: TGDel (placeholder — fullscreen app loads via JS) -->
+    <div class="tab-content" id="tab-tgdel"></div>
+
+  <!-- TGDel Fullscreen App (outside #app) -->
+  <div id="tg-app" class="tg-app tg-hidden">
+    <!-- Screen 1: Chat list -->
+    <div id="tg-screen-list" class="tg-screen">
+      <div class="tg-topbar">
+        <button class="tg-topbar-btn tg-exit-btn" id="tg-exit">← Назад</button>
+        <div class="tg-topbar-title">TGDel</div>
+        <label class="tg-toggle-wrap">
+          <input type="checkbox" id="toggle-tgdel">
+          <div class="tg-toggle-track"></div>
+          <div class="tg-toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="tg-search">
+        <div class="tg-search-bar">
+          <span class="tg-search-icon">🔍</span>
+          <span class="tg-search-text">Поиск</span>
         </div>
       </div>
-
-      <!-- Screen 2: Chat messages -->
-      <div id="tgdel-chat" class="tgdel-screen tgdel-hidden">
-        <div class="tgdel-chat-header">
-          <button class="tgdel-back" id="tgdel-back">←</button>
-          <div class="tgdel-chat-avatar" id="tgdel-chat-avatar"></div>
-          <div class="tgdel-chat-name" id="tgdel-chat-name"></div>
+      <div class="tg-filters">
+        <div class="tg-filter active">Все</div>
+        <div class="tg-filter">Удалённые</div>
+        <div class="tg-filter">Изменённые</div>
+        <div class="tg-filter">Одноразовые</div>
+      </div>
+      <div id="tg-chat-list" class="tg-chat-list">
+        <div class="tg-empty">
+          <div class="tg-empty-icon">🗑️</div>
+          <div class="tg-empty-text">Удалённых сообщений нет</div>
+          <div class="tg-empty-sub">Включи TGDel и жди</div>
         </div>
-        <div id="tgdel-messages" class="tgdel-messages"></div>
       </div>
     </div>
+
+    <!-- Screen 2: Chat view -->
+    <div id="tg-screen-chat" class="tg-screen tg-offscreen-right">
+      <div class="tg-chat-topbar">
+        <button class="tg-chat-back" id="tg-chat-back">‹</button>
+        <div class="tg-chat-info">
+          <div class="tg-chat-av" id="tg-chat-av"></div>
+          <div class="tg-chat-title" id="tg-chat-title"></div>
+        </div>
+      </div>
+      <div id="tg-chat-msgs" class="tg-chat-msgs"></div>
+    </div>
+  </div>
 
     <!-- Tab: Profiles -->
     <div class="tab-content" id="tab-profiles">
