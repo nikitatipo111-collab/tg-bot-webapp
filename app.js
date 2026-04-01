@@ -479,7 +479,7 @@ document.querySelectorAll(".quick-test-btn").forEach(btn => {
 document.getElementById("clear-history-btn").addEventListener("click", clearChatHistory);
 document.getElementById("blacklist-add-btn").addEventListener("click", addToBlacklist);
 document.getElementById("tg-exit").addEventListener("click", closeTGDel);
-document.getElementById("tg-exit2").addEventListener("click", closeTGDel);
+// tg-exit2 removed — back is via tg-exit only
 document.getElementById("tg-chat-back").addEventListener("click", closeTGChat);
 
 // Filter click handlers
