@@ -716,6 +716,7 @@ function tgDateLabel(dateStr) {
   return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
 }
 
+
 function tgMediaUrl(fileId) {
   if (!fileId) return "";
   const initData = tg?.initData || "";
@@ -729,96 +730,124 @@ function renderTGMsgs(msgs) {
     return;
   }
 
-  const checks = `<span class="tg-bub-checks"><svg width="16" height="10" viewBox="0 0 16 10"><path d="M1 5l3 3 7-7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5l3 3 7-7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  // SVG double check marks
+  const checksSvg = '<span class="tg-bub-checks"><svg viewBox="0 0 16 11" fill="none"><path d="M1 5.5L4.5 9L11 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5.5L8.5 9L15 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 
   let lastDate = null;
-  const html = msgs.map((m, i) => {
+  let lastOwn = null; // track sender for grouping
+
+  const parts = [];
+
+  msgs.forEach((m, i) => {
     const own = m.is_own;
-    const side = own ? "tg-bub-right" : "";
     const isPhoto = m.msg_type === "photo" || m.msg_type === "sticker";
     const isVoice = m.msg_type === "voice" || m.msg_type === "video_note";
     const isVideo = m.msg_type === "video";
     const hasFile = !!m.file_id;
-    const hasText = !!(m.original || m.new_text);
+    const hasText = !!(m.original);
 
-    // Date separator
-    let dateSep = "";
+    // --- Date separator ---
     const dateLabel = tgDateLabel(m.date);
     if (dateLabel && dateLabel !== lastDate) {
       lastDate = dateLabel;
-      dateSep = `<div class="tg-date-sep"><span>${dateLabel}</span></div>`;
+      parts.push(`<div class="tg-date-sep"><span>${dateLabel}</span></div>`);
+      lastOwn = null; // reset grouping after date
     }
 
-    // Check if next message is from same sender (for tail logic)
+    // --- Grouping: gap between different senders ---
+    const sameGroup = lastOwn === own;
+    const gapClass = (lastOwn !== null && !sameGroup) ? "tg-msg-gap" : "";
+    lastOwn = own;
+
+    // --- Tail: only on last message before sender change or end ---
     const next = msgs[i + 1];
-    const isLast = !next || next.is_own !== own;
-    const tailClass = isLast ? (own ? "tg-bub-tail-right" : "tg-bub-tail-left") : "";
+    const nextDateLabel = next ? tgDateLabel(next.date) : null;
+    const isLastInGroup = !next || next.is_own !== own || (nextDateLabel && nextDateLabel !== dateLabel);
+    const tailClass = isLastInGroup ? (own ? "tg-bub-tail-r" : "tg-bub-tail-l") : "";
 
-    // Meta: time + checks
-    const meta = `<span class="tg-bub-meta"><span class="tg-bub-meta-time">${m.time}</span>${own ? checks : ""}</span>`;
-
-    // Photo rendering
-    function photoBlock() {
-      if (!hasFile) return '<div class="tg-bub-media">📷 фото</div>';
-      return `<div class="tg-bub-photo"><img src="${tgMediaUrl(m.file_id)}" alt="photo" loading="lazy"></div>`;
+    // --- Sender name above first message from other in group ---
+    let senderHtml = "";
+    if (!own && !sameGroup) {
+      senderHtml = `<div class="tg-sender-name">${m.name || ""}</div>`;
     }
 
-    // Media type label
-    function mediaLabel() {
-      if (isVoice) return `<div class="tg-bub-media">🎤 голосовое</div>`;
-      if (isVideo) return `<div class="tg-bub-media">🎬 видео</div>`;
-      if (m.msg_type === "document") return `<div class="tg-bub-media">📄 документ</div>`;
-      if (m.msg_type === "sticker") return hasFile ? `<div class="tg-bub-photo"><img src="${tgMediaUrl(m.file_id)}" alt="sticker" style="max-width:150px"></div>` : `<div class="tg-bub-media">🏷 стикер</div>`;
+    // --- Meta: time + checks ---
+    const meta = `<span class="tg-bub-meta"><span class="tg-bub-meta-time">${m.time}</span>${own ? checksSvg : ""}</span>`;
+
+    // --- Photo block ---
+    function photoHtml() {
+      if (!hasFile) return '<div class="tg-bub-media">📷 фото</div>';
+      return `<div class="tg-bub-photo"><img src="${tgMediaUrl(m.file_id)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='📷 фото'"></div>`;
+    }
+
+    // --- Media label ---
+    function mediaHtml() {
+      if (isVoice) return '<div class="tg-bub-media">🎤 голосовое</div>';
+      if (isVideo) return '<div class="tg-bub-media">🎬 видео</div>';
+      if (m.msg_type === "document") return '<div class="tg-bub-media">📄 документ</div>';
+      if (m.msg_type === "sticker") {
+        return hasFile
+          ? `<div class="tg-bub-photo"><img src="${tgMediaUrl(m.file_id)}" alt="" style="max-width:150px" onerror="this.parentNode.innerHTML='🏷 стикер'"></div>`
+          : '<div class="tg-bub-media">🏷 стикер</div>';
+      }
       return "";
     }
 
-    // Photo-only bubble class
-    const photoOnlyClass = isPhoto && hasFile && !hasText ? "tg-bub-photo-only" : "";
+    // --- Photo-only class ---
+    const photoClass = (isPhoto && hasFile && !hasText) ? "tg-bub-has-photo" : "";
+    const side = own ? "tg-bub-right" : "";
 
-    function wrapBubble(content) {
-      return `<div class="tg-bub ${side} ${tailClass} ${photoOnlyClass}">${content}</div>`;
-    }
+    // --- Build bubble content ---
+    let bubbleContent = "";
 
     if (m.event === "deleted") {
-      let content = "";
       if (isPhoto) {
-        content = `${photoBlock()}${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}`;
+        bubbleContent = `${photoHtml()}${hasText ? `<div class="tg-bub-txt">${m.original}</div>` : ""}`;
       } else if (m.msg_type !== "text") {
-        content = `${mediaLabel()}${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}`;
+        bubbleContent = `${mediaHtml()}${hasText ? `<div class="tg-bub-txt">${m.original}</div>` : ""}`;
       } else {
-        content = `<div class="tg-bub-txt">${m.original || ""}</div>`;
+        bubbleContent = `<div class="tg-bub-txt">${m.original || ""}</div>`;
       }
-      return `${dateSep}${wrapBubble(`${content}
-        <div class="tg-bub-lbl tg-lbl-del">🗑 удалено ${m.time}</div>
-        ${meta}
-      `)}`;
+      bubbleContent += `<div class="tg-bub-lbl tg-lbl-del">🗑 удалено ${m.time}</div>${meta}`;
+
     } else if (m.event === "edited") {
-      return `${dateSep}${wrapBubble(`
+      // First bubble: old text
+      const bub1 = `<div class="tg-bub ${side} ${tailClass}">
         <div class="tg-bub-txt strike">${m.original || ""}</div>
-        <div class="tg-bub-lbl tg-lbl-was">✏️ было</div>
-        ${meta}
-      `)}
-      <div class="tg-arrow ${own ? "tg-arrow-right" : ""}">↓</div>
-      ${wrapBubble(`
+        <div class="tg-bub-lbl tg-lbl-was">✏️ было</div>${meta}
+      </div>`;
+      // Arrow
+      const arrow = `<div class="tg-arrow ${own ? "tg-arrow-right" : ""}">↓</div>`;
+      // Second bubble: new text
+      const bub2 = `<div class="tg-bub ${side}">
         <div class="tg-bub-txt">${m.new_text || ""}</div>
-        <div class="tg-bub-lbl tg-lbl-now">✏️ стало</div>
-        ${meta}
-      `)}`;
+        <div class="tg-bub-lbl tg-lbl-now">✏️ стало</div>${meta}
+      </div>`;
+
+      parts.push(`<div class="tg-msg-wrap ${own ? "tg-msg-own" : ""} ${gapClass}">
+        ${senderHtml}${bub1}${arrow}${bub2}
+      </div>`);
+      return; // skip normal wrapping
+
     } else if (m.event === "view_once") {
-      let content = "";
       if (isPhoto && hasFile) {
-        content = photoBlock();
+        bubbleContent = photoHtml();
       } else {
-        content = m.original ? `<div class="tg-bub-txt">${m.original}</div>` : '<div class="tg-bub-media">📷 одноразовое медиа</div>';
+        bubbleContent = hasText
+          ? `<div class="tg-bub-txt">${m.original}</div>`
+          : '<div class="tg-bub-media">📷 одноразовое</div>';
       }
-      return `${dateSep}${wrapBubble(`${content}
-        <div class="tg-bub-lbl tg-lbl-vo">👁 одноразовое</div>
-        ${meta}
-      `)}`;
+      bubbleContent += `<div class="tg-bub-lbl tg-lbl-vo">👁 одноразовое</div>${meta}`;
     }
-    return dateSep;
-  }).join("");
-  el.innerHTML = html;
+
+    // --- Wrap in bubble + wrapper ---
+    parts.push(`<div class="tg-msg-wrap ${own ? "tg-msg-own" : ""} ${gapClass}">
+      ${senderHtml}
+      <div class="tg-bub ${side} ${tailClass} ${photoClass}">${bubbleContent}</div>
+    </div>`);
+  });
+
+  el.innerHTML = parts.join("");
   el.scrollTop = el.scrollHeight;
 }
 
