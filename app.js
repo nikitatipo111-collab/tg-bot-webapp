@@ -550,7 +550,10 @@ function tgInitial(n) { return (n || "?").charAt(0).toUpperCase(); }
 function openTGDel() {
   document.getElementById("tg-app").classList.remove("tg-hidden");
   document.getElementById("app").style.display = "none";
+  document.getElementById("loading").style.display = "none";
   document.querySelector(".aurora").style.display = "none";
+  document.body.style.padding = "0";
+  document.body.style.overflow = "hidden";
   loadTGChats();
   if (tg) tg.HapticFeedback?.impactOccurred("medium");
 }
@@ -559,6 +562,8 @@ function closeTGDel() {
   document.getElementById("tg-app").classList.add("tg-hidden");
   document.getElementById("app").style.display = "block";
   document.querySelector(".aurora").style.display = "";
+  document.body.style.padding = "";
+  document.body.style.overflow = "";
   // Reset to list screen
   document.getElementById("tg-screen-chat").classList.add("tg-offscreen-right");
   // Switch back to main tab
