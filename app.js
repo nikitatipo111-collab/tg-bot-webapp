@@ -808,7 +808,7 @@ function renderTGMsgs(msgs) {
       } else {
         bubbleContent = `<div class="tg-bub-txt">${m.original || ""}</div>`;
       }
-      bubbleContent += `<div class="tg-bub-lbl tg-lbl-del">🗑 удалено ${m.time}</div>${meta}`;
+      bubbleContent += `<div class="tg-bub-lbl tg-lbl-del">🗑 удалено</div>${meta}`;
 
     } else if (m.event === "edited") {
       // First bubble: old text

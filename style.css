@@ -1263,7 +1263,7 @@ body {
   max-width: 80%;
   border-radius: 18px 18px 18px 6px;
   padding: 6px 10px 5px;
-  background: #212121;
+  background: #2A2A2D;
   position: relative;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1285,7 +1285,7 @@ body {
   position: absolute;
   bottom: 0; left: -8px;
   width: 11px; height: 20px;
-  background: radial-gradient(ellipse at top right, transparent 72%, #212121 72%);
+  background: radial-gradient(ellipse at top right, transparent 72%, #2A2A2D 72%);
 }
 .tg-bub-tail-r {
   border-radius: 18px 18px 0 18px !important;
