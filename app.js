@@ -856,7 +856,7 @@ function renderTGMsgs(msgs) {
 }
 
 // === TGDel Tab navigation ===
-unction tgSwitchScreen(screenName) {
+function tgSwitchScreen(screenName) {
   const list = document.getElementById("tg-screen-list");
   const settings = document.getElementById("tg-screen-settings");
   if (screenName === "list") {
@@ -874,7 +874,7 @@ function renderTGMsgs(msgs) {
   if (tg) tg.HapticFeedback?.impactOccurred("light");
 }
 
-unction fillTGSettings() {
+function fillTGSettings() {
   const user = tg?.initDataUnsafe?.user;
   const av = document.getElementById("tg-settings-av");
   const name = document.getElementById("tg-settings-name");
