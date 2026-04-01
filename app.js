@@ -33,6 +33,7 @@ function initTabs() {
       document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
       tab.classList.add("active");
       document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+      if (tab.dataset.tab === "tests") loadChatStats();
       if (tg) tg.HapticFeedback?.impactOccurred("light");
     });
   });
@@ -289,12 +290,81 @@ async function clearMemory() {
   }
 }
 
+// === Test Functions ===
+
+async function testReply(text) {
+  if (busy || !text.trim()) return;
+  busy = true;
+  const resultDiv = document.getElementById("test-result");
+  const replyDiv = document.getElementById("test-reply");
+  const sendBtn = document.getElementById("test-send-btn");
+  resultDiv.style.display = "block";
+  replyDiv.textContent = "думаю...";
+  replyDiv.className = "test-reply loading";
+  sendBtn.disabled = true;
+  if (tg) tg.HapticFeedback?.impactOccurred("light");
+  try {
+    const res = await api("/api/test-reply", "POST", { text: text.trim() });
+    if (res.reply) {
+      replyDiv.textContent = res.reply;
+      replyDiv.className = "test-reply";
+      if (tg) tg.HapticFeedback?.notificationOccurred("success");
+    } else {
+      replyDiv.textContent = res.error || "ошибка";
+      replyDiv.className = "test-reply";
+    }
+  } catch (e) {
+    replyDiv.textContent = "не удалось";
+    replyDiv.className = "test-reply";
+  }
+  sendBtn.disabled = false;
+  busy = false;
+}
+
+async function loadChatStats() {
+  try {
+    const res = await api("/api/chat-stats");
+    document.getElementById("active-chats").textContent = res.active_chats || 0;
+    document.getElementById("total-history").textContent = res.total_messages || 0;
+  } catch (e) {}
+}
+
+async function clearChatHistory() {
+  const doClear = async () => {
+    if (tg) tg.HapticFeedback?.notificationOccurred("warning");
+    await api("/api/clear-history", "POST");
+    loadChatStats();
+  };
+  if (tg) {
+    tg.showConfirm("Очистить все диалоги бота?", (ok) => { if (ok) doClear(); });
+  } else {
+    if (confirm("Очистить все диалоги бота?")) doClear();
+  }
+}
+
 // === Events ===
 
 document.getElementById("toggle-auto").addEventListener("change", (e) => toggleAuto(e.target.checked));
 document.getElementById("toggle-learn").addEventListener("change", (e) => toggleLearn(e.target.checked));
 document.getElementById("toggle-voice").addEventListener("change", (e) => toggleVoice(e.target.checked));
 document.getElementById("clear-btn").addEventListener("click", clearMemory);
+
+document.getElementById("test-send-btn").addEventListener("click", () => {
+  testReply(document.getElementById("test-input").value);
+});
+
+document.getElementById("test-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") testReply(e.target.value);
+});
+
+document.querySelectorAll(".quick-test-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.getElementById("test-input").value = btn.dataset.msg;
+    testReply(btn.dataset.msg);
+  });
+});
+
+document.getElementById("clear-history-btn").addEventListener("click", clearChatHistory);
 
 document.getElementById("analyze-btn").addEventListener("click", async () => {
   const btn = document.getElementById("analyze-btn");

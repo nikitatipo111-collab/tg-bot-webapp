@@ -643,3 +643,131 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* === Tests Tab === */
+
+.test-input-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.test-input-wrap input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.test-input-wrap input:focus {
+  border-color: var(--accent);
+}
+
+.test-input-wrap input::placeholder {
+  color: var(--text-3);
+}
+
+.test-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.test-send-btn:active {
+  opacity: 0.7;
+}
+
+.test-send-btn:disabled {
+  opacity: 0.4;
+}
+
+.test-result {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.test-label {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.test-reply {
+  font-size: 15px;
+  color: var(--text);
+  background: rgba(124, 106, 239, 0.08);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  min-height: 20px;
+}
+
+.test-reply.loading {
+  color: var(--text-3);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.quick-tests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-test-btn {
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-test-btn:active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent-2);
+}
+
+.chat-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.stat-row span:first-child {
+  color: var(--text-2);
+}
+
+.stat-row span:last-child {
+  color: var(--text);
+  font-weight: 600;
+}

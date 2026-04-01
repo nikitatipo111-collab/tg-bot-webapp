@@ -43,6 +43,7 @@
     <div class="tabs">
       <button class="tab active" data-tab="main">Главная</button>
       <button class="tab" data-tab="styles">Стили</button>
+      <button class="tab" data-tab="tests">Тесты</button>
       <button class="tab" data-tab="profiles">Профили</button>
     </div>
 
@@ -115,6 +116,52 @@
       <div class="section">
         <div class="section-title">Готовые стили</div>
         <div class="items-grid" id="presets-list"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Tests -->
+    <div class="tab-content" id="tab-tests">
+      <div class="section">
+        <div class="section-title">Тест ответа</div>
+        <div class="card">
+          <div class="test-input-wrap">
+            <input type="text" id="test-input" placeholder="Напиши сообщение..." autocomplete="off">
+            <button class="test-send-btn" id="test-send-btn">→</button>
+          </div>
+          <div id="test-result" class="test-result" style="display:none">
+            <div class="test-label">Бот ответит:</div>
+            <div id="test-reply" class="test-reply"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Быстрые тесты</div>
+        <div class="quick-tests">
+          <button class="quick-test-btn" data-msg="привет">привет</button>
+          <button class="quick-test-btn" data-msg="как дела">как дела</button>
+          <button class="quick-test-btn" data-msg="что делаешь">что делаешь</button>
+          <button class="quick-test-btn" data-msg="пойдем гулять">пойдем гулять</button>
+          <button class="quick-test-btn" data-msg="ты кто">ты кто</button>
+          <button class="quick-test-btn" data-msg="иди нахуй">иди нахуй</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Статистика</div>
+        <div class="card">
+          <div id="chat-stats" class="chat-stats">
+            <div class="stat-row">
+              <span>Активных диалогов</span>
+              <span id="active-chats">—</span>
+            </div>
+            <div class="stat-row">
+              <span>Всего сообщений в памяти</span>
+              <span id="total-history">—</span>
+            </div>
+          </div>
+        </div>
+        <button class="danger-btn" id="clear-history-btn" style="margin-top:12px">Очистить все диалоги</button>
       </div>
     </div>
 
