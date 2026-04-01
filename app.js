@@ -479,6 +479,7 @@ document.querySelectorAll(".quick-test-btn").forEach(btn => {
 document.getElementById("clear-history-btn").addEventListener("click", clearChatHistory);
 document.getElementById("blacklist-add-btn").addEventListener("click", addToBlacklist);
 document.getElementById("tg-exit").addEventListener("click", closeTGDel);
+document.getElementById("tg-exit2").addEventListener("click", closeTGDel);
 document.getElementById("tg-chat-back").addEventListener("click", closeTGChat);
 document.getElementById("toggle-tgdel").addEventListener("change", (e) => {
   api("/api/tgdel/toggle", "POST", { enabled: e.target.checked });
@@ -625,6 +626,7 @@ async function openTGChat(chatId, name) {
   av.style.background = tgAvStyle(chatId);
   av.textContent = tgInitial(name);
   document.getElementById("tg-chat-title").textContent = name;
+  document.getElementById("tg-chat-sub").textContent = "антиудаление активно";
 
   // Slide in
   document.getElementById("tg-screen-chat").classList.remove("tg-offscreen-right");
@@ -655,27 +657,27 @@ function renderTGMsgs(msgs) {
     const media = m.msg_type !== "text" ? `<div class="tg-bub-media">📎 ${m.msg_type}</div>` : "";
 
     if (m.event === "deleted") {
-      return `<div class="tg-bub tg-bub-del ${side}">
-        <div class="tg-bub-lbl tg-lbl-del">УДАЛЕНО</div>
-        ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}${media}
+      return `<div class="tg-bub ${side}">
+        <div class="tg-bub-txt">${m.original || ""}</div>${media}
+        <div class="tg-bub-lbl tg-lbl-del">🗑 удалено ${m.time}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>`;
     } else if (m.event === "edited") {
-      return `<div class="tg-bub tg-bub-old ${side}">
-        <div class="tg-bub-lbl tg-lbl-was">БЫЛО</div>
+      return `<div class="tg-bub ${side}">
         <div class="tg-bub-txt strike">${m.original || ""}</div>
+        <div class="tg-bub-lbl tg-lbl-was">✏️ изменено ${m.time}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>
       <div class="tg-arrow ${side}">↓</div>
-      <div class="tg-bub tg-bub-new ${side}">
-        <div class="tg-bub-lbl tg-lbl-now">СТАЛО</div>
+      <div class="tg-bub ${side}">
         <div class="tg-bub-txt">${m.new_text || ""}</div>
+        <div class="tg-bub-lbl tg-lbl-now">→ новый текст</div>
       </div>`;
     } else if (m.event === "view_once") {
-      return `<div class="tg-bub tg-bub-vo ${side}">
-        <div class="tg-bub-lbl tg-lbl-vo">ОДНОРАЗОВОЕ</div>
+      return `<div class="tg-bub ${side}">
         ${m.original ? `<div class="tg-bub-txt">${m.original}</div>` : ""}
         ${media || '<div class="tg-bub-media">📷 медиа</div>'}
+        <div class="tg-bub-lbl tg-lbl-vo">👁 одноразовое ${m.time}</div>
         <div class="tg-bub-time">${m.time}</div>
       </div>`;
     }
