@@ -214,30 +214,39 @@
     <!-- Tab: TGDel (placeholder — fullscreen app loads via JS) -->
     <div class="tab-content" id="tab-tgdel"></div>
 
-  <!-- TGDel Fullscreen App (outside #app) -->
+    <!-- Tab: Profiles -->
+    <div class="tab-content" id="tab-profiles">
+      <div class="section">
+        <div class="section-title">Мои профили</div>
+        <div class="items-grid" id="profiles-list"></div>
+        <button class="add-btn" id="add-profile-btn">+ Новый профиль</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TGDel Fullscreen (OUTSIDE #app) -->
   <div id="tg-app" class="tg-app tg-hidden">
     <!-- Screen 1: Chat list -->
     <div id="tg-screen-list" class="tg-screen">
       <div class="tg-topbar">
-        <button class="tg-topbar-btn tg-exit-btn" id="tg-exit">← Назад</button>
+        <div class="tg-topbar-left">
+          <button class="tg-topbar-btn" id="tg-exit">‹ Назад</button>
+        </div>
         <div class="tg-topbar-title">TGDel</div>
-        <label class="tg-toggle-wrap">
-          <input type="checkbox" id="toggle-tgdel">
-          <div class="tg-toggle-track"></div>
-          <div class="tg-toggle-thumb"></div>
-        </label>
+        <div class="tg-topbar-right">
+          <label class="tg-toggle-wrap">
+            <input type="checkbox" id="toggle-tgdel">
+            <div class="tg-toggle-track"></div>
+            <div class="tg-toggle-thumb"></div>
+          </label>
+        </div>
       </div>
       <div class="tg-search">
         <div class="tg-search-bar">
-          <span class="tg-search-icon">🔍</span>
+          <svg class="tg-search-svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#8E8E93" stroke-width="1.5"/><line x1="11" y1="11" x2="14" y2="14" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/></svg>
           <span class="tg-search-text">Поиск</span>
         </div>
-      </div>
-      <div class="tg-filters">
-        <div class="tg-filter active">Все</div>
-        <div class="tg-filter">Удалённые</div>
-        <div class="tg-filter">Изменённые</div>
-        <div class="tg-filter">Одноразовые</div>
       </div>
       <div id="tg-chat-list" class="tg-chat-list">
         <div class="tg-empty">
@@ -251,25 +260,16 @@
     <!-- Screen 2: Chat view -->
     <div id="tg-screen-chat" class="tg-screen tg-offscreen-right">
       <div class="tg-chat-topbar">
-        <button class="tg-chat-back" id="tg-chat-back">‹</button>
+        <button class="tg-chat-back" id="tg-chat-back">
+          <svg width="12" height="20" viewBox="0 0 12 20" fill="none"><path d="M10 2L2 10L10 18" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div class="tg-chat-info">
-          <div class="tg-chat-av" id="tg-chat-av"></div>
+          <div class="tg-av tg-av-sm" id="tg-chat-av"></div>
           <div class="tg-chat-title" id="tg-chat-title"></div>
         </div>
       </div>
       <div id="tg-chat-msgs" class="tg-chat-msgs"></div>
     </div>
-  </div>
-
-    <!-- Tab: Profiles -->
-    <div class="tab-content" id="tab-profiles">
-      <div class="section">
-        <div class="section-title">Мои профили</div>
-        <div class="items-grid" id="profiles-list"></div>
-        <button class="add-btn" id="add-profile-btn">+ Новый профиль</button>
-      </div>
-    </div>
-
   </div>
 
   <!-- Modal -->

@@ -934,15 +934,16 @@ body {
   border-color: var(--accent);
 }
 
-/* === TGDel — Full Telegram 2026 Clone === */
+/* === TGDel — Telegram 2026 iOS Clone === */
 
 .tg-app {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 9999;
   background: #000;
-  font-family: -apple-system, 'SF Pro Display', BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .tg-hidden { display: none !important; }
@@ -952,37 +953,50 @@ body {
   top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
 }
 
 .tg-offscreen-right { transform: translateX(100%); }
 
-/* Top bar */
+/* === Top bar — glassmorphism === */
 .tg-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 6px 16px;
   min-height: 44px;
   flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.33px solid rgba(255,255,255,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
+.tg-topbar-left { flex: 1; }
+.tg-topbar-right { flex: 1; display: flex; justify-content: flex-end; }
 
 .tg-topbar-btn {
   background: none;
   border: none;
   color: #a78bfa;
-  font-size: 15px;
+  font-size: 17px;
   cursor: pointer;
   padding: 4px 0;
+  font-family: inherit;
 }
 
 .tg-topbar-title {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
+  letter-spacing: -0.2px;
 }
 
-/* Toggle (TG style) */
+/* Toggle iOS style */
 .tg-toggle-wrap {
   position: relative;
   display: inline-block;
@@ -1011,64 +1025,35 @@ body {
   width: 27px; height: 27px;
   background: #fff;
   border-radius: 50%;
-  transition: transform 0.3s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.3s cubic-bezier(0.3, 1.2, 0.3, 1);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .tg-toggle-wrap input:checked ~ .tg-toggle-thumb {
   transform: translateX(20px);
 }
 
-/* Search */
+/* Search — Telegram style */
 .tg-search {
-  padding: 0 16px 8px;
+  padding: 0 16px 10px;
   flex-shrink: 0;
 }
 
 .tg-search-bar {
   background: #1C1C1E;
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 7px 10px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.tg-search-icon { font-size: 14px; opacity: 0.4; }
+.tg-search-svg { flex-shrink: 0; opacity: 0.5; }
 
 .tg-search-text {
-  font-size: 15px;
+  font-size: 17px;
   color: #8E8E93;
-}
-
-/* Filters */
-.tg-filters {
-  display: flex;
-  gap: 6px;
-  padding: 4px 16px 10px;
-  overflow-x: auto;
-  flex-shrink: 0;
-  -webkit-overflow-scrolling: touch;
-}
-
-.tg-filters::-webkit-scrollbar { display: none; }
-
-.tg-filter {
-  padding: 6px 14px;
-  border-radius: 16px;
-  background: #1C1C1E;
-  color: #8E8E93;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s;
-}
-
-.tg-filter.active {
-  background: #a78bfa;
-  color: #fff;
+  font-weight: 400;
 }
 
 /* Chat list */
